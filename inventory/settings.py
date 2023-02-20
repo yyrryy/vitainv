@@ -23,31 +23,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '2j-tes@g+5%*wg!^o8h49br$0^$y7=)ai32vi3&sey2r0j209_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = True
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
-    DATABASES = {
-        'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
-    ALLOWED_HOSTS = ['159.223.9.55']
-    DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'myproject',
-        'USER': 'myprojectuser',
-        'PASSWORD': 'gadwad123',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
+ALLOWED_HOSTS = ['159.223.9.55', 'localhost']
+DATABASES = {
+'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'myproject',
+    'USER': 'myprojectuser',
+    'PASSWORD': 'gadwad123',
+    'HOST': 'localhost',
+    'PORT': '',
+}
 }
 
 
