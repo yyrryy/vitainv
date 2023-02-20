@@ -1,0 +1,43 @@
+*.pyc
+*~
+/media/*
+/static/
+/locale/
+/logs/*
+.venv/
+venv
+## all migrations
+migrations
+
+__pycache__
+
+migrations
+
+# Byte-compiled / optimized / DLL files
+db.sqlite3
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+# IDE Projects
+/.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.pydevproject
+
+# Installation-specific
+.env
+
+# testing related files
+.coverage
+
+/inventory/settings_local.py
+db.local_inventory

@@ -1,0 +1,15 @@
+{% if not k.children.all %}
+<li class="pure-tree_link">
+    <a href="#" class="categoriesbtn" data-catgoryid="{{k.id}}">{{k.name}}</a>
+</li>
+{% else %}
+<li>
+<input type="checkbox" id="trigger-layout{{k.id}}">
+<label for="trigger-layout{{k.id}}">{{k.name}}</label>
+<ul class="pure-tree">
+    {% for k in k.children.all %}
+    {% include 'nested.html' %}
+    {% endfor %}
+</ul>
+</li>
+{% endif %}

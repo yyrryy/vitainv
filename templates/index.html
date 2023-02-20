@@ -1,0 +1,439 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- model of add stock -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        
+        <div class="modal-body">
+            <form class="form-horizontal product_item_form" action="" method="post" autocomplete="off">
+                <div class="form-group">
+                        <div class="">
+                        <label><strong>Quantité</strong></label>
+                        <span class="item-error" style="color:red; display:none">...</span>
+                        <input type="number"  class="form-control quantity"  name="quantity" id="quantity"  required><br>
+                    <div class="col-md-4">
+                        {% csrf_token %}
+                        
+                        <input type="hidden" name="purchased_item" value="0">
+                        <input type="hidden" name="product" value="">
+                        <input type="hidden" name="retail_price" value="0">
+                    </div>
+                    
+                    <div class="">
+                        <button type="button"  class="btn btn-primary product-sub-btn" style="width: 100%"  data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i>Processing Order">Enregistrer</button>
+                    </div>
+                    </div>
+                    
+                    
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+<div class="container mb-5">
+    <div class="p-2 d-flex justify-content-between">
+        <!-- <form enctype="multipart/form-data" action="{% url 'product:addbulk' %}" method="post" class="d-flex">
+            <input class="form-control" type="file" name="productsfile" id="formFile" required>
+            <button class="btn btn-primary submitbulk">
+                إضافة منتجات
+            </button>
+        </form> -->
+        <button type="button" class="btn btn-success addoneproduct w-100" data-bs-toggle="modal" data-bs-target="#addoneproductmodal">
+            إضافة منتج
+        </button>
+    </div>
+
+    <!-- this was a quik search for items -->
+    <!-- <div class="bg-white rounded shadow p-2">
+       
+        <table class="mb-5 table table-striped table-bordered table-advance table-hover item-table">
+            <div class="row" style="padding: 5px">
+                <div class="">
+                    <input type="text" class="form-control name_search" placeholder="البحث عن منتج" >
+                </div>
+            </div>
+            <hr>
+            <thead>
+            <tr>
+                <th class="text-center">الاسم</th>
+                <th class="text-center">الفئة</th>
+                <th class="text-center">المخزون</th>
+                <th class="text-center">ثمن الشراء</th>
+                <th class="text-center">ثمن البيع</th>
+            </tr>
+            </thead>
+            <tbody class="product-table-body text-center product_search_result">
+            
+            </tbody>
+        </table>
+       
+    </div> -->
+
+    <div class="bg-white shadow rounded mt-3 p-3 d-flex justify-content-between">
+        
+        <a class="text-danger" href=" {% url 'product:lowstock' %} ">
+            نفاذ المخزون <span class="bg-danger rounded px-3 text-white">{{p_n}}</span>
+        </a>
+        <p>
+            {{today_sales_count}} عدد الفواتير اليوم
+        </p>
+        <p>
+            عدد المنتوجات: {{length}}
+        </p> 
+    </div>
+    <br><br>
+
+    <div class="row text-center">
+        {% if request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_LEDGER_VIEW or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_OWNER or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_VIEW_ACCOUNT %}
+        <div class="col-lg-4 col-md-6 ">
+            <a href="{% url 'ledger:customer_ledger_list' %}">
+                <div class="panel panel_bg_color">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <i class="fa fa-group fa-4x" style="color:#fff"></i>
+                            </div>
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <div class="panel_txt">الزبناء</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        <!--add product div -->
+        <!-- {% if request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_DATA_ENTRY_USER or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_OWNER or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_VIEW_ACCOUNT %}
+        <div class="col-lg-4 col-md-6 ">
+            <a href="{% url 'product:stock_items_list' %}">
+                <div class="panel panel_bg_color">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <i class="fa fa-shopping-cart fa-4x" style="color:#fff"></i>
+                            </div>
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <div class="panel_txt">Produits</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %} -->
+        {% if request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_SALESMAN or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_OWNER or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_VIEW_ACCOUNT %}
+        
+        {% endif %}
+        <!--add sales div -->
+        {% if request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_SALESMAN or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_OWNER or request.user.retailer_user.role_type == request.user.retailer_user.ROLE_TYPE_VIEW_ACCOUNT %}
+        <div class="col-lg-4 col-md-6 ">
+            <a href="{% url 'sales:invoice_list' %}">
+                <div class="panel panel_bg_color">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <i class="fa fa-dollar fa-4x" style="color:#fff"></i>
+                            </div>
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <div class="panel_txt">المبيعات / الفولتير</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        <!-- !!! Adding a url tpo modeify company-s data -->
+        <!-- <div class="col-lg-4 col-md-6  mt-2">
+            <a href="/editdata">
+                <div class="panel panel_bg_color">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <i class="fa fa-list fa-4x" style="color:#fff"></i>
+                            </div>
+                            <div class="col-xs-12 text-center">
+                                <div class="panel_txt">Donnée</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div> -->
+        <div class="col-lg-4 col-md-6 ">
+            <a href="{% url 'product:productslistbycategory' %}">
+                <div class="panel panel_bg_color">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <i class="fa fa-group fa-4x" style="color:#fff"></i>
+                            </div>
+                            <div class="col-xs-12 text-center">
+                                <br>
+                                <br>
+                                <div class="panel_txt">المنتوجات</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+     <!--add logs div -
+     <div class="col-lg-4 col-md-6 ">
+        <a href="{% url 'product:daily_stock_logs' %}">
+            <div class="panel panel_bg_color">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <br>
+                            <br>
+                            <i class="fa fa-sign-in fa-4x" style="color:#fff"></i>
+                        </div>
+                        <div class="col-xs-12 text-center">
+                            <br>
+                            <br>
+                            <div class="panel_txt">LOGS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    col-div end here--->
+    
+    <br>
+    
+<!--col-div end here--->
+</div>
+
+
+<!-- add one product model -->
+<div class="modal fade" id="addoneproductmodal" tabindex="-1" aria-labelledby="eaddoneproductmodalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        
+        <div class="modal-body">
+          <form class="addoneproductform" method="post" action="{% url 'product:addoneproduct' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>
+                    المنتج - الماركة
+                </label>
+                <input class="form-control" required type="text" name="name" >
+            </div>
+            <div class="mb-3">
+                <label for="">
+                    ثمن البيع
+                </label>
+                <input required type="number" class="form-control" name="price" >
+            </div>
+            <div class="mb-3">
+                <label>
+                    ثمن الشراء
+                </label>
+                <input type="number" required class="form-control" name="prachat" >    
+            </div>
+            <div class="mb-3">
+                <label for="">
+                    المخزون
+                </label>
+                <input class="form-control" required type="number" name="stock">
+            </div>
+            <div class="mb-3">
+                <select class="form-select" required type="number" name="category">
+                    {% for i in cc %}
+                    <option value="{{i.id}}">
+                        
+                        {{i.name}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary addoneproductbtn">إضافة</button>
+
+        </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    $(function () {
+        $(".product-sub-btn").on ('click', function(){
+                $(this).addClass('disabled');
+                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Loading...');
+                var error= false;
+
+                if ($('.product-error').val() == ""){
+                    $('.product-error').show();
+                    error = true;
+                }
+                else {
+                    $('.product-error').hide();
+                }
+                if ($('.quantity').val () == ""){
+                    $('.item-error').show();
+                    error = true;
+                }
+                else {
+                    $('.item-error').hide();
+                }
+                if (error == true) {
+                    $(this).removeClass('disabled');
+                    $(this).html('Enregister');
+                    return;
+                }
+                else
+                {
+                    $('.product_item_form').submit();
+
+                }
+
+            });
+
+        addstockform=$('.product_item_form')
+        $('.name_search').on('change', function () {
+            if ($('.name_search').val()==''){
+                $('.product_search_result').html('')
+            }
+            else{
+                $.ajax({
+                url: "/product/product_search",
+                type: "POST",
+                data: {
+                    'name': $('.name_search').val(),
+                },
+                success: function (data) {
+                    $('.product_search_result').html(data.data)
+                    $('.addstock').each((i, el)=>{
+                        $(el).on('click', ()=>{
+                            addstockform.find('[name=product]').val($(el).attr('data-id'))
+                            addstockform.attr('action', '/product/stock/item/'+$(el).attr('data-id')+'/add/')
+                        })
+                    })
+                }
+            })
+            }
+        });
+        
+        // $('.addoneproductbtn').on('click', (e)=>{
+        //     e.preventDefault()
+        //     if ($('[name=productname]').val() == '' || $('[name=productprice]').val() == '' || $('[name=productstock]').val() == '' || $('[name=productprachat]').val() == '' || $('[name=category]').val() == 0 ){
+        //         alert('المرجو ملئ الخانات')
+        //         return
+        //     }
+        //     if (confirm('هل انت متأكد من المعلومات المدخلة ؟')){
+        //         $('.addoneproductform').submit()
+        //     }
+        // })
+        // $('.addoneproductbtn').on('click', (e)=>{
+        //     if ($('[name=productname]').val() == '' || $('[name=productprice]').val() == '' || $('[name=productstock]').val() == '' || $('[name=productprachat]').val() == '' || $('[name=category]').val() == 0 ){
+        //         alert('المرجو ملئ الخانات')
+        //         return
+        //     }
+        //     $('.addoneproductbtn').attr('disabled', true)
+        //     e.preventDefault();
+        //     // send data to server
+        //     $.ajax({
+        //         url: "{% url 'product:addoneproduct' %}",
+        //         type: "POST",
+        //         data: {
+        //             'name':$('[name=productname]').val(),
+        //             'brand':$('[name=productbrand]').val(),
+        //             'price':$('[name=productprice]').val(),
+        //             'stock':$('[name=productstock]').val(),
+        //             'prachat':$('[name=productprachat]').val(),
+        //             'category':$('[name=category]').val(),
+        //             'csrfmiddlewaretoken': '{{ csrf_token }}'
+        //         },
+        //         success: function (data) {
+        //             console.log(data)
+        //             // $('.product-table-body').prepend(`
+        //             //         <tr>
+        //             //             <td>${data.data.name}</td>
+        //             //             <td>${data.data.brand}</td>
+        //             //             <td>${data.data.stock}</td>
+        //             //             <td>
+        //             //                 <a href="{% url 'product:update_product' pk=0 %}${data.data.id}"><button class="btn btn-success btn-xs">تعديل</button></a>
+        //             //                 <a href="{% url 'product:stockin_list' product_id=0 %}${data.data.id}"><button class="btn btn-primary btn-xs"><i class="fa fa-plus
+        //             //                 "></i></button></a>
+        //             //                 <a href="{% url 'product:stockout_list' product_id=0 %}${data.data.id}"><button class="btn btn-danger btn-xs" title="Stock Out">الخروج</button></a>
+        //             //             </td>
+        //             //         </tr>
+        //             //     `)
+        //             // // clear form   
+        //             $('form')[2].reset()
+        //             location.reload()
+        //         },
+        //         // refresh 
+        //         error: function (data) {
+        //             console.log(data)
+        //         }
+        //     });
+
+        // })
+        $('.deleteproduct').each((i, el)=>{
+            $(el).on('click', ()=>{
+                t=$(el)
+                if (confirm('Supprimer ?')){
+                    $.ajax({
+                        url: "{% url 'product:delete_product' %}",
+                        type: "POST",
+                        data: {
+                            'id': t.attr('data-id'),
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function (data) {
+                            console.log(data)
+                            if (data.status == 'success'){
+                                t.parent().parent().remove()
+                            }
+                        },
+                        error: function (data) {
+                            console.log(data)
+                        }
+                    });
+                }
+            })
+        })
+    
+    });
+    
+</script>
+{% endblock %}

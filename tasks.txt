@@ -1,0 +1,16 @@
+instalation process:
+makemigrations 
+migrate
+create super user
+create retailer
+create a user in user model
+create a retailers in retailers model
+then assign it to retailer-user in retailer model
+
+
+
+
+
+
+create form to add categories
+jard lm5won

@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+{% block submenu_add_product %}active{% endblock %}
+{% block menu_product %}active{% endblock %}
+
+{% block css %}
+<style>
+    
+    
+.pure-tree {
+  text-align: left;
+  display: block;
+}
+.pure-tree.main-tree {
+  width: 18em;
+  display: inline-block;
+  padding-left: 0;
+}
+.pure-tree:not(.main-tree) {
+  padding-left: .5em;
+  background: aliceblue;
+}
+.pure-tree:not(.main-tree) li {
+  overflow: hidden;
+  height: 0;
+  display: block;
+}
+.pure-tree label {
+  display: block;
+  cursor: pointer;
+  color: #717780;
+  border-bottom: 1px dashed #B0B9C5;
+  padding: 1.125em 1.125em 1.125em 0;
+}
+.pure-tree label:before {
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+  display: inline-block;
+  font-family: 'FontAwesome', sans-serif;
+  content: "\f114";
+  padding-right: .75em;
+}
+.pure-tree label:hover {
+  color: #434a58;
+  border-bottom-color: #434a58;
+}
+.pure-tree .pure-tree_link a {
+  padding: 1.500em 1.125em 0.750em 0;
+  display: block;
+  text-decoration: none;
+}
+.pure-tree .pure-tree_link a:hover {
+  color: #434a58;
+}
+.pure-tree.nested {
+  padding-left: 1.7em;
+}
+.pure-tree [type="checkbox"] {
+  display: none;
+}
+.pure-tree [type="checkbox"]:checked + label {
+  color: #434a58;
+  border-bottom-color: #434a58;
+}
+.pure-tree [type="checkbox"]:checked ~ ul > li {
+  height: auto;
+}
+.categoryactive{
+        background: white;
+        padding: 7px;
+        color: #dc3545;
+        font-weight: bold;
+    }
+</style>
+{%endblock%}
+{% block content %}
+<!-- add products -->
+<div class="row mb-2 bg-white shadow rounded p-3 mb-2">
+    <small class="rtl">
+        اضافة المنتوجات حسب الفئة
+    </small>
+    <div class="col-md-6">
+        <select class="form-select select2" required type="number" name="category">
+            {% for i in children %}
+            <option value="{{i.id}}">
+                {{i.name}}
+            </option>
+            
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-6">
+        <form enctype="multipart/form-data" action="/product/items/addbulkcategory/{{firstid}}" method="post" class="addbulk d-flex">
+            {% csrf_token %}
+            <input class="form-control" type="file" name="productsfile" id="formFile" required>
+            <button class="btn btn-primary submitbulk">
+                إضافة
+            </button>
+        </form>
+    </div>
+    
+</div>
+
+<div class="row bg-white">
+    
+
+    <!-- categories display -->
+    <div class="col-md-3" style="height: 75vh; overflow-y: scroll;"> 
+        <form action="{% url 'product:addcategory' %}" method="post">
+            <div class="form-control text-center">
+                <small class="">
+                    اضافة الفئات
+                </small>
+                <select name="parent" class="form-select select2 mb-2">
+                    <option value="0">---</option>
+                    {% for i in parents %}
+                        <option value="{{i.id}}">
+                            {{i.name}}
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="category" placeholder="Nom" required class="form-control mt-3">
+                <button class="btn btn-primary w-100 mt-2">
+                    ارسال
+                </button>
+            </div>
+        </form>
+
+        <!-- categories disply -->
+        <ul id="compositions-list" class="pure-tree main-tree">
+            {% for i in categories %}
+            <li>
+                
+              <input type="checkbox" id="trigger-views{{i.id}}">
+              <label for="trigger-views{{i.id}}">{{i.name}}</label>
+              <ul class="pure-tree">
+                {% for k in i.children.all %}
+                {% include 'nested.html' %}
+                {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+          </ul>
+       
+        <!-- <div class="mt-2">
+            <ul class="list-group">
+                {% for i in cc %}
+                <li class="list-group-item ">
+                        <button class="btn d-flex justify-content-between w-100 categoriesbtn" data-catgoryid="{{i.id}}">
+                        <b>
+                            {{i.name}}
+                        </b> 
+                        
+                    </button>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+        </div> -->
+
+    </div>
+
+    <!-- products -->
+    <div class="col-md-9 position-relative" style="height: 75vh; overflow-y: scroll;">
+        <div class="loadertable d-flex justify-content-center align-items-center" style="
+            position: absolute;
+            z-index: 9999;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: #0000007d;
+        ">
+            <div class="spinner-border text-white" role="status">
+                
+            </div>
+        </div>
+        <table class="mb-5 table table-striped table-bordered table-advance table-hover item-table">
+            <div class="sticky-top bg-white">
+                <h5 class="categorynameholder text-center">
+                    
+                </h5>
+            
+                <div class="">
+                    <input type="text" class="form-control name_search" placeholder="البحث عن منتج" data-catgoryid="1">
+                </div>
+            </div>
+            <thead>
+            <tr>
+                <th class="text-center">الاسم</th>
+                <th class="text-center">الفئة</th>
+                <th class="text-center">المخزون</th>
+                <th class="text-center">ثمن الشراء</th>
+                <th class="text-center">ثمن البيع</th>
+            </tr>
+            </thead>
+            <tbody class="product-table-body text-center product_search_result">
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- modal update products -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        
+        <div class="modal-body">
+            <form class="form-horizontal add-product-form" action="" method="post" autocomplete="off">
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        {% csrf_token %}
+                        <label><strong>المنتج</strong></label>
+                        <input type="text" class="form-control product_name" name="name"   placeholder="Article" value=""><br>
+                        <label><strong> ثمن البيع </strong></label>
+                        <input type="number" class="form-control product_name" name="price"   placeholder="Prix" value=""><br>
+                        <label><strong> ثمن الشراء </strong></label>
+                        <input type="number" class="form-control product_name" name="pr_achat"  placeholder="Prix d'achat" value=""><br>
+                        
+                        <br>
+
+                        <input type="hidden" name="retailer" value="{{ request.user.retailer_user.retailer.id }}">
+                        <button type="submit" id="save" class="btn btn-primary product-submit-btn w-100" style="float: right" >Enregister</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+          
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- add stock modal -->
+<div class="modal fade" id="addstockmodal" tabindex="-1" aria-labelledby="addstockmodalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        
+        <div class="modal-body">
+            <form class="form-horizontal product_item_form" action="" method="post" autocomplete="off">
+                <div class="form-group">
+                        <div class="">
+                        <label><strong>Quantité</strong></label>
+                        <span class="item-error" style="color:red; display:none">...</span>
+                        <input type="number"  class="form-control quantity"  name="quantity" id="quantity"  required><br>
+                    <div class="col-md-4">
+                        {% csrf_token %}
+                        
+                        <input type="hidden" name="purchased_item" value="0">
+                        <input type="hidden" name="product" value="">
+                        <input type="hidden" name="retail_price" value="0">
+                    </div>
+                    
+                    <button type="submit" id="save" class="btn btn-primary product-sub-btn w-100" style="float: right" >Enregister</button>
+                    </div>
+                    
+                    
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+          
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+    $(document).ready(()=>{
+
+        // change action in form
+        $('[name="category"]').on('change', ()=>{
+            console.log('changed')
+            $('.addbulk').attr('action', '/product/items/addbulkcategory/'+$('[name="category"]').val())
+
+        })
+
+        // serch in tables instead of sending ajax request
+        $(".name_search").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                // $(".product_search_result tr").filter(function() {
+                //   $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                // });
+                // search only in the first td ot each tr 
+                $(".product_search_result tr").filter(function() {
+                    $(this).toggle($(this).find('td:first').text().toLowerCase().indexOf(value) > -1)
+                });
+                editproduct()
+                addstock()
+              });
+
+        // edit product handler
+        updateform=$('.add-product-form')
+        addstockform=$('.product_item_form')
+       
+        const editproduct=()=>{
+            $('.update').each((i, el)=>{
+                $(el).on('click', ()=>{
+                    console.log($(el).attr('data-id'))
+                    updateform.attr('action', '/product/updateproduct/'+$(el).attr('data-id'))
+                    updateform.attr('id', i+1)
+                    $('[name="name"]').val($(el).parent().parent().find('.product_name').text())
+                    $('[name="price"]').val(parseFloat($(el).parent().parent().find('.product_price').text()))
+                    $('[name="pr_achat"]').val(parseFloat($(el).parent().parent().find('.product_pr_achat').text()))
+                })
+            })
+        }
+        
+        const addstock=()=>{
+            $('.addstockbtn').each((i, el)=>{
+                $(el).on('click', ()=>{
+                    console.log($(el).attr('data-id'))
+                    addstockform.attr('action', '/product/addstock/'+$(el).attr('data-id'))
+                    addstockform.attr('id', i+1)
+                })
+            })
+        }
+        // function to get products by category
+        function getproductsbycategory(categoryid){
+            $('.loadertable').addClass('d-block').removeClass('d-none')
+            $.ajax({
+            url: "{% url 'product:getproductsbycategory' %}",
+            type: "POST",
+            data: {
+                'category': categoryid,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (data) {
+                $('.loadertable').addClass('d-none').removeClass('d-block')
+                $('.product-table-body').html(data.data)
+                editproduct()
+                addstock()
+                }
+            })
+            
+        }
+        
+
+        
+
+
+        // active the first category
+        $('.categoriesbtn').first().addClass('categoryactive')
+        $('.categorynameholder').text($('.categoriesbtn').first().text())
+        // get the first category products
+        getproductsbycategory($('.categoriesbtn').first().data('catgoryid'))
+        
+        //$('.name_search').data('catgoryid', $('.categoriesbtn').first().data('catgoryid'))
+        
+        // search products handler
+    //    $('.name_search').on('change', function () {
+    //         if ($('.name_search').val()==''){
+    //             getproductsbycategory($('.name_search').data('catgoryid'))
+    //         }
+    //         else{
+    //             $.ajax({
+    //             url: "{% url 'product:searchproductsincategory' %}",
+    //             type: "POST",
+    //             data: {
+    //                 'name': $('.name_search').val(),
+    //                 'category': $('.name_search').data('catgoryid'),
+    //                 'csrfmiddlewaretoken': '{{ csrf_token }}'
+    //             },
+    //             success: function (data) {
+    //                 $('.product_search_result').html(data.data)
+    //                 editproduct()
+    //             }
+    //         })
+    //         }
+    //     }); 
+    
+        // categories btns handler
+        
+        // to szich categories
+        $('.categoriesbtn').each((i, el)=>{
+            $(el).on('click', ()=>{
+                $('.categoriesbtn').removeClass('categoryactive')
+                let catgoryid=$(el).data('catgoryid')
+                $('.categorynameholder').text($(el).text())
+                $('.name_search').data('catgoryid', catgoryid)
+                $(el).addClass('categoryactive')
+                // ajax to get products by category
+                getproductsbycategory(catgoryid)
+                
+            })
+        })
+    
+        // handl submit form update product
+        $('.add-product-form').on('submit', function (e) {
+            $('product-submit-btn').attr('disabled', true)
+            e.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: "POST",
+                data: {
+                    'name': $('[name="name"]').val(),
+                    'price': $('[name="price"]').val(),
+                    'pr_achat': $('[name="pr_achat"]').val(),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status){
+                        console.log(data.status)
+                        
+                        row=$('tr')[updateform.attr('id')]
+                        $(row).find('.product_name').text($('[name="name"]').val())
+                        $(row).find('.product_price').text($('[name="price"]').val())
+                        $(row).find('.product_pr_achat').text($('[name="pr_achat"]').val())
+                        $('.add-product-form').trigger('reset')
+                        $('#exampleModal').modal('hide')
+                    }
+                    else{
+                        alert(data.error)
+                    }
+                }
+            })
+        })
+
+
+        // handl addstock submit
+        addstockform.on('submit', function (e) {
+            $('product-sub-btn').attr('disabled', true)
+            e.preventDefault()
+            $.ajax({
+                url: $(this).attr('action'),
+                type: "POST",
+                data: {
+                    'stock': $('[name="quantity"]').val(),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status){
+                        row=$('tr')[addstockform.attr('id')]
+                        console.log(row)                        
+                        let oldqty=parseFloat($(row).find('.product_stock').text())
+                        let newqty=parseFloat($('[name="quantity"]').val())+oldqty
+                        console.log(newqty)
+                        $(row).find('.product_stock').text(newqty)
+                        addstockform.trigger('reset')
+                        $('#addstockmodal').modal('hide')
+                    }
+                    else{
+                        alert(data.error)
+                    }
+                }
+            })
+        })
+
+
+
+    })
+
+</script>
+{% endblock %}

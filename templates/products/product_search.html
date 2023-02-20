@@ -1,0 +1,31 @@
+{% for item in products %}
+    <tr>
+        <td class="product_name">{{ item.name}}</td>
+        <td class="#">{{ item.category }}</td>
+        <td class="product_stock">{{item.product_available_items}}
+            <!-- <button type="button" class="btn btn-success addstock" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="{{item.id}}">
+                +
+            </button> -->
+        </td>
+        <td class="product_pr_achat">{{ item.pr_achat}}</td>
+        <td class="product_price">{{ item.price}}</td>
+        <td>
+            <button type="button" class="btn btn-success update" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="{{item.id}}">
+                تعديل
+            </button>
+            <!-- <button type="button" class="btn btn-primary addstockbtn" data-bs-toggle="modal" data-bs-target="#addstockmodal" data-id="{{item.id}}">
+                +
+            </button> -->
+            <a target="_blank" href="{% url 'product:producthistory' id=item.id %}"><button class="btn btn-danger btn-xs" title="Stock Out">السجل</button></a>
+            <!-- <a href="{% url 'product:update_product' pk=item.id %}"><button class="btn btn-success btn-xs">تعديل</button></a> -->
+            <!-- <a href="{% url 'product:stockin_list' product_id=item.id %}"><button class="btn btn-primary btn-xs">الدخول</button></a> -->
+            
+            <!-- <button class="btn btn-danger btn-xs deleteproduct" title="Supprimer" data-id="{{item.id}}"><i class="fa fa-trash-o"></i></button> -->
+        </td>
+    </tr>
+{% empty %}
+    <tr>
+        <td colspan="6">No products found</td>
+    </tr>
+
+{% endfor %}
