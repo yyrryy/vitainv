@@ -6,12 +6,9 @@
 /logs/*
 .venv/
 venv
-## all migrations
-migrations
 
 __pycache__
 
-migrations
 
 # Byte-compiled / optimized / DLL files
 db.sqlite3
