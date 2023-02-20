@@ -26,7 +26,4 @@ urlpatterns = [
     re_path(r'^sales/', include(('pis_sales.urls', 'sales'), namespace='sales')),
     re_path(r'^ledger/', include(('pis_ledger.urls','ledger'), namespace='ledger')),
     
-    path('masta/', admin.site.urls),
-]
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('masta/', admin.site.urls),]
