@@ -201,7 +201,10 @@ def bon(request, pk):
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
     buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename=f'bon_sortie{inv.receipt_no}.pdf')
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="bon_sortie{inv.receipt_no}.pdf"'
+    response.write(buffer.getvalue())
+    return response
 
 
 class CreateInvoiceView(FormView):
