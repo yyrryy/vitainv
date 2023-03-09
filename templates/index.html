@@ -48,13 +48,11 @@
                 إضافة منتجات
             </button>
         </form> -->
-        <button type="button" class="btn btn-success addoneproduct w-100" data-bs-toggle="modal" data-bs-target="#addoneproductmodal">
-            إضافة منتج
-        </button>
+        
     </div>
 
     <!-- this was a quik search for items -->
-    <!-- <div class="bg-white rounded shadow p-2">
+    <!-- <div class="rounded shadow p-2">
        
         <table class="mb-5 table table-striped table-bordered table-advance table-hover item-table">
             <div class="row" style="padding: 5px">
@@ -79,7 +77,7 @@
        
     </div> -->
 
-    <div class="bg-white shadow rounded mt-3 p-3 d-flex justify-content-between">
+    <div class="shadow rounded mt-3 p-3 d-flex justify-content-between">
         
         <a class="text-danger" href=" {% url 'product:lowstock' %} ">
             نفاذ المخزون <span class="bg-danger rounded px-3 text-white">{{p_n}}</span>
@@ -234,60 +232,7 @@
 </div>
 
 
-<!-- add one product model -->
-<div class="modal fade" id="addoneproductmodal" tabindex="-1" aria-labelledby="eaddoneproductmodalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        
-        <div class="modal-body">
-          <form class="addoneproductform" method="post" action="{% url 'product:addoneproduct' %}">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label>
-                    المنتج - الماركة
-                </label>
-                <input class="form-control" required type="text" name="name" >
-            </div>
-            <div class="mb-3">
-                <label for="">
-                    ثمن البيع
-                </label>
-                <input required type="number" class="form-control" name="price" >
-            </div>
-            <div class="mb-3">
-                <label>
-                    ثمن الشراء
-                </label>
-                <input type="number" required class="form-control" name="prachat" >    
-            </div>
-            <div class="mb-3">
-                <label for="">
-                    المخزون
-                </label>
-                <input class="form-control" required type="number" name="stock">
-            </div>
-            <div class="mb-3">
-                <select class="form-select" required type="number" name="category">
-                    {% for i in cc %}
-                    <option value="{{i.id}}">
-                        
-                        {{i.name}}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
 
-            <button type="submit" class="btn btn-primary addoneproductbtn">إضافة</button>
-
-        </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-          
-        </div>
-      </div>
-    </div>
-  </div>
 {% endblock %}
 
 

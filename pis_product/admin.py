@@ -6,8 +6,7 @@ from pis_product.models import ProductDetail
 from pis_product.models import PurchasedProduct
 from pis_product.models import ExtraItems
 from pis_product.models import ClaimedProduct
-from pis_product.models import StockIn,StockOut, Category, SubCategory
-
+from pis_product.models import StockIn,StockOut, Category, SubCategory, Itemsbysupplier, Avancesbon, Supplier
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
@@ -144,3 +143,6 @@ admin.site.register(StockIn, StockInAdmin)
 admin.site.register(StockOut, StockOutAdmin)
 admin.site.register(Category)
 admin.site.register(SubCategory)
+admin.site.register(Avancesbon)
+admin.site.register(Itemsbysupplier)
+admin.site.register(Supplier)

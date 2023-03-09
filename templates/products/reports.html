@@ -3,33 +3,37 @@
 {% block submenu_list_items %}active{% endblock %}
 {% block content %}
 <div class="filterholder p-3 row text-center">
-        <div class="col-4">
-            <select class="form-select" name="year1">
-                <option value="0">--</option>
-                <option value="2023">2023</option>
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-            </select>
-        </div>
-        <div class="col-4">
-            <select class="form-select col-4" name="month1">
-                <option value="0">--</option>
-                <option value="1">يناير</option>
-                <option value="2">فبراير</option>
-                <option value="3">مارس</option>
-                <option value="4">ابريل</option>
-                <option value="5">مايو</option>
-                <option value="6">يونيو</option>
-                <option value="7">يوليو</option>
-                <option value="8">اغسطس</option>
-                <option value="9">سبتمبر</option>
-                <option value="10">اكتوبر</option>
-                <option value="11">نوفمبر</option>
-                <option value="12">ديسمبر</option>
-            </select>
-        </div>
-        <button class="findnetprofit btn btn-primary fa fa-search col-4">
-        </button>
+    <div class="col-md-3">
+        <input type="date" class="form-control date">
+    </div>
+
+    <div class="col-md-3">
+        <select class="form-select" name="year1">
+            <option value="0">--</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" name="month1">
+            <option value="0">--</option>
+            <option value="1">يناير</option>
+            <option value="2">فبراير</option>
+            <option value="3">مارس</option>
+            <option value="4">ابريل</option>
+            <option value="5">مايو</option>
+            <option value="6">يونيو</option>
+            <option value="7">يوليو</option>
+            <option value="8">اغسطس</option>
+            <option value="9">سبتمبر</option>
+            <option value="10">اكتوبر</option>
+            <option value="11">نوفمبر</option>
+            <option value="12">ديسمبر</option>
+        </select>
+    </div>
+    <button class="findnetprofit btn btn-primary fa fa-search col-md-3">
+    </button>
     </div>
 <div class="row mb-3 position-relative">
     <div class="col-12">
@@ -43,10 +47,11 @@
     <!-- netprofit -->
     <div class="col-lg-4 col-6">
     
-        <div class="bg-{% if netprofit > 0%}success{%else%}danger{%endif%} shadow text-center rounded py-2 text-white">
+        <div class="shadow text-center rounded py-2 text-white netprofitholder">
         
-        <h3 class="netprofit"></h3>
-        <p>
+            <h3 class="netprofit"></h3>
+            <p>
+                  <span>Dh</span>
             الارباح الصافية
         </p>
         </div>
@@ -57,8 +62,9 @@
     
         <div class="shadow text-center rounded py-2 bg-white">
         
-        <h3 class="totalcost"></h3>
-        <p>
+            <h3 class="totalcost"></h3>
+            <p>
+                  <span>Dh</span>
             التكاليف الاجمالية
         </p>
         </div>
@@ -69,8 +75,9 @@
     
         <div class="shadow text-center rounded py-2 bg-white">
         
-        <h3 class="totalprofit"></h3>
-        <p>
+            <h3 class="totalprofit"></h3>
+            <p>
+                  <span>Dh</span>
             الارباح الاجمالية
         </p>
         </div>
@@ -87,7 +94,7 @@
             <div class="spinner-border text-primary text-white" role="status">
             </div>
         </div>
-        <div class="tableholder bg-white rounded shadow">
+        <div class="tableholder rounded shadow">
             <h4 class="text-center">
                 الاقل مبيعا
             </h4>
@@ -117,7 +124,7 @@
             <div class="spinner-border text-primary text-white" role="status">
             </div>
         </div>
-        <div class="tableholder bg-white rounded shadow">
+        <div class="tableholder rounded shadow">
             <h4 class="text-center">
                 الاكثر مبيعا
             </h4>
@@ -144,11 +151,7 @@
 </div>
 
 <div class="surah mt-5 rtl">
-    <p>
-        أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ ﴿١﴾ وَوَضَعْنَا عَنكَ وِزْرَكَ ﴿٢﴾ الَّذِي أَنقَضَ ظَهْرَكَ ﴿٣﴾ وَرَفَعْنَا لَكَ ذِكْرَكَ ﴿٤﴾ فَإِنَّ مَعَ الْعُسْرِ يُسْرًا﴿٥﴾ إِنَّ مَعَ الْعُسْرِ يُسْرًا ﴿٦﴾ فَإِذَا فَرَغْتَ فَانصَبْ ﴿٧﴾ وَإِلَىٰ رَبِّكَ فَارْغَب ﴿٨﴾
-
-
-    </p>
+    
 </div>
 
 {% endblock %}
@@ -156,6 +159,47 @@
 {% block scripts %}
 <script>
     $(document).ready(function(){
+
+        //date search
+        $('.date').on('change', function () {
+            if ($(this).val() == '') {
+                return
+                
+            } 
+            else {
+                $('.loadingnumbers').removeClass('d-none').addClass('d-flex');
+                $('.loadingproducts').removeClass('d-none').addClass('d-flex');
+                $.post("{% url 'product:dailystats' %}",{
+                    'date': $(this).val(),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data, status){
+                    data.netprofit>0?$('.netprofitholder').removeClass('bg-danger').addClass('bg-success')
+                    :$('.netprofitholder').removeClass('bg-success').addClass('bg-danger')
+                    $('.loadingnumbers').removeClass('d-flex').addClass('d-none');
+                    $('.netprofit').text(data.netprofit);
+                    // totalcost and totalprofit
+                    $('.totalcost').text(data.totalcost);
+                    $('.totalprofit').text(data.totalprofit);
+                })
+                $.post("{% url 'product:dailyproductsranking' %}",{
+                    'date': $(this).val(),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data, status){
+                    $('.loadingproducts').removeClass('d-flex').addClass('d-none');
+                    $('.productsranking').html(data.data);
+                })
+                $('.downranking').html('');
+                // $.post("{% url 'product:dailyproductsrankingdown' %}",{
+                //     'date': $(this).val(),
+                //     'csrfmiddlewaretoken': '{{ csrf_token }}'
+                // }, function(data, status){
+                //     console.log(data)
+                //     $('.downrankingload').removeClass('d-flex').addClass('d-none');
+                // })
+            }
+        })
+
+
         // products ranking
         $.post("{% url 'product:productsranking' %}",{
             'year': $('select[name="year1"]').val(),
@@ -181,6 +225,8 @@
             'month': $('select[name="month1"]').val(),
             'csrfmiddlewaretoken': '{{ csrf_token }}'
         }, function(data, status){
+            data.netprofit>0?$('.netprofitholder').removeClass('bg-danger').addClass('bg-success')
+            :$('.netprofitholder').removeClass('bg-success').addClass('bg-danger')
             $('.loadingnumbers').removeClass('d-flex').addClass('d-none');
             $('.netprofit').text(data.netprofit);
             // totalcost and totalprofit
@@ -198,6 +244,8 @@
                 'month': $('select[name="month1"]').val(),
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             }, function(data, status){
+                data.netprofit>0?$('.netprofitholder').removeClass('bg-danger').addClass('bg-success')
+                :$('.netprofitholder').removeClass('bg-success').addClass('bg-danger')
                 $('.loadingnumbers').removeClass('d-flex').addClass('d-none');
                 $('.netprofit').text(data.netprofit);
                 // totalcost and totalprofit

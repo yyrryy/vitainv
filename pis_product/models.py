@@ -15,7 +15,16 @@ class Itemsbysupplier(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     items = models.TextField(blank=True, null=True, help_text='Quantity and Product name would save in JSON format')
     total = models.DecimalField(max_digits=65, decimal_places=2, default=0.00)
-    
+    nbon = models.CharField(max_length=100, blank=True, null=True)
+    rest= models.DecimalField(max_digits=65, decimal_places=2, default=0.00)
+
+
+class Avancesbon(models.Model):
+    bon = models.ForeignKey(Itemsbysupplier, related_name='supplier_avance',on_delete=models.CASCADE, default=None)
+    date = models.DateTimeField(auto_now_add=True)
+    avance = models.DecimalField(max_digits=65, decimal_places=2, default=0.00)
+    details = models.CharField(max_length=100, blank=True, null=True)
+
 class Category(models.Model):
     parent = models.ForeignKey('self', related_name='children', on_delete=models.CASCADE, blank = 
     True, null=True)
@@ -54,7 +63,6 @@ class Product(models.Model):
             stock_in = 0
 
         return stock_in
-
 
     def product_available_items(self):
         try:

@@ -33,7 +33,9 @@
                     <tbody class="invoice-table-body text-center">
                     {% for invoice in object_list %}
                         <tr>
-                            <td><a href="{% url 'sales:invoice_detail' invoice_id=invoice.id %}">{{ invoice.receipt_no }}</a></td>
+                            <td>
+                                {{ invoice.receipt_no }}
+                            </td>
                             <td>{% if invoice.customer %}{{ invoice.customer.customer_name|title}}{% else %}-{% endif %}</td>
                             <td>{{ invoice.total_quantity }}</td>
                             <td>{{ invoice.grand_total|floatformat:-2 }}</td>

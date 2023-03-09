@@ -8,14 +8,23 @@ from .views import (
     PurchasedItems, ExtraItemsView, ClaimedProductFormView,
     ClaimedItemsListView, StockItemList, AddStockItems, StockOutItems,
     StockDetailView, StockInListView, StockOutListView, ProductUpdateView,
-    StockInUpdateView, addbulk, product_search, deleteproduct, lowstock, addoneproduct, getproducts, productslistbycategory, categories, addbulkcategory, deletecategory, addcategory, getproductsbycategory, searchproductsincategory, updateproduct, addstock, producthistory, supply, addsupply, reportnetprofit, reports, productsranking, downranking, relve, statsofrelve, addsupplier, supplierslist, 
+    StockInUpdateView, addbulk, product_search, deleteproduct, lowstock, addoneproduct, getproducts, productslistbycategory, categories, addbulkcategory, deletecategory, addcategory, getproductsbycategory, searchproductsincategory, updateproduct, addstock, producthistory, supply, addsupply, reportnetprofit, reports, productsranking, downranking, relve, statsofrelve, addsupplier, dailystats, dailyproductsranking, dailyproductsrankingdown, bonentree, supplierslist, supplierinfo, addpaymentsupplier, addclient, dailystatsstock, bonsentrees
 )
 
 from pis_product.logs_view import DailyStockLogs, MonthlyStockLogs
 
 
 urlpatterns = [
-    re_path(r'^supplierslist/(?P<id>\d+)',supplierslist, name='supplierslist'),
+    re_path(r'^addclient/',addclient, name='addclient'),
+    re_path(r'^bonsentrees/',bonsentrees, name='bonsentrees'),
+    re_path(r'^dailystatsstock/',dailystatsstock, name='dailystatsstock'),
+    re_path(r'^bonentree/(?P<id>\d+)',bonentree, name='bonentree'),
+    re_path(r'^supplierslist/',supplierslist, name='supplierslist'),
+    re_path(r'^supplierinfo/(?P<id>\d+)',supplierinfo, name='supplierinfo'),
+    re_path(r'^addpaymentsupplier/(?P<id>\d+)',addpaymentsupplier, name='addpaymentsupplier'),
+    re_path(r'^dailystats/',dailystats, name='dailystats'),
+    re_path(r'^dailyproductsranking/',dailyproductsranking, name='dailyproductsranking'),
+    re_path(r'^dailyproductsrankingdown/',dailyproductsrankingdown, name='dailyproductsrankingdown'),
 
     re_path(r'^items/list/$', ProductItemList.as_view(), name='items_list'),
     re_path(r'^items/addbulk/',addbulk, name='addbulk'),

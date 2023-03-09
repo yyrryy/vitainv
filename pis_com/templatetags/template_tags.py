@@ -3,6 +3,8 @@ from pis_product.models import StockIn,StockOut, Product
 
 register = template.Library()
 
+
+
 @register.simple_tag
 def product_notifications(retailer_id):
     p=Product.objects.filter(retailer__id=retailer_id)
@@ -15,4 +17,3 @@ def lenproducts():
 @register.simple_tag
 def products():
     return Product.objects.all()
-

@@ -43,9 +43,8 @@
                     <td>{{ item.bar_code}}</td> -->
                     <td>
                         <!-- new code -->
-                        <a href="{% url 'product:update_product' pk=item.id %}"><button class="btn btn-success btn-xs">تعديل</button></a>
-                        <a href="{% url 'product:stockin_list' product_id=item.id %}"><button class="btn btn-primary btn-xs">الدخول</button></a>
-                        <a href="{% url 'product:stockout_list' product_id=item.id %}"><button class="btn btn-danger btn-xs" title="Stock Out">الخروج</button></a>
+                        <!-- <a href="{% url 'product:update_product' pk=item.id %}"><button class="btn btn-success btn-xs">تعديل</button></a> -->
+                        <a target="_blank" href="{% url 'product:producthistory' id=item.id %}"><button class="btn btn-danger btn-xs" title="Stock Out">السجل</button></a>
                         <!-- delete item is commented for now cause of the factorizaation -->
                         <!-- <button class="btn btn-danger btn-xs deleteproduct" title="Supprimer" data-id="{{item.id}}"><i class="fa fa-trash-o"></i></button> -->
 

@@ -10,14 +10,7 @@
         inv.init();
 
         jQuery('body').on('click', function (e) {
-            var cur = e.target.id || e.target.className;
-
-            if (cur == $.opt.addRow.substring(1))
-                inv.newRow();
-
-            if (cur == $.opt.delete.substring(1))
-                inv.deleteRow(e.target);
-
+            
             inv.init();
         });
 
@@ -133,7 +126,6 @@ Invoice.prototype = {
     calcRemainingAmount: function () {
         var remainingAmount = (Number(jQuery($.opt.grandTotal).html())
                        - Number(jQuery($.opt.paidAmount).val())).toFixed(2);
-        console.log(remainingAmount)
         jQuery($.opt.remainingAmount).html(remainingAmount);
         return 1;
     },

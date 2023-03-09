@@ -1,5 +1,5 @@
 {% for item in products %}
-    <tr>
+    <tr class="{% if item.product_available_items <= 10 %}bg-danger text-white{% endif %}">
         <td class="product_name">{{ item.name}}</td>
         <td class="#">{{ item.category }}</td>
         <td class="product_stock">{{item.product_available_items}}

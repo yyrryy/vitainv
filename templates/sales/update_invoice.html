@@ -189,76 +189,20 @@
                 $(this).parent().parent().parent().find('.price').val(item_price);
             });
             $('#invoice_update').live('click', function () {
-
+                var error = false;
+                $('.qty').each((i, e)=>{
+                    if($(e).val()==''){
+                        $(e).css({
+                            'border':'1px solid red'
+                        })
+                        error=true
+                    }
+                })
                 if ($('#item-name').hasClass('item-name') == false ) {
                     $('.item-error').show();
                     return;
                 }
-                var error = false;
-                if ($('.customer').is(":visible") == true)
-                {
-                    // if ($('.customer').val() =="")
-                    // {
-                    //     $('.customer').css('border-color', 'red');
-                    //     error = true;
-                    // } else {
-                    //     $('.customer').css('border', 'none');
-                    // }
-                    var existing_customers_id = [];
-                    {% for customer in customers %}
-                        existing_customers_id.push({{ customer.id }});
-                    {% endfor %}
-
-                    var cus_val = $('.customer').val();
-                    var cus_id = $('#customer-list [value="' + cus_val + '"]').data('id');
-                    // if(jQuery.inArray( cus_id, existing_customers_id ) == -1) {
-                    //     $('.customer-error').show();
-                    //     $('.customer').css('border-color', 'red');
-                    //     return;
-                    // } else {
-                    //     $('.customer-error').hide();
-                    // }
-                }
-                if ($('.customer_name').is(":visible") == true) {
-                    if ($('.customer_name').val() == "") {
-                        $('.customer_name').css('border-color', 'red');
-                        error = true;
-                    }
-                    else {
-                        $('.customer_name').css('border', 'none');
-                    }
-                    if ($('.customer_phone').val() == "") {
-                        $('.customer_phone').css('border-color', 'red');
-                    }
-                    else {
-                        $('.customer_phone').css('border', 'none');
-                    }
-                    {% for customer in customers %}
-                        if ($('.customer_name').val() == '{{ customer.customer_name }}' && $('.customer_phone').val()== '{{ customer.customer_phone }}') {
-                            $('.already-error').show();
-                            return;
-                        }
-                    {% endfor %}
-                }
-                if       ($('.invoice-item').val() == ""){
-                    $(".item-error").show();
-                    error=true;
-                    $('.invoice-item').css('border-color', 'red');
-                }
-                else {
-                    $('.invoice-item').css('border' ,'none');
-
-                }
-                if ($('.price').val()=="") {
-
-                    $('.item-error').show();
-                    $('.price').css('border-color', 'red');
-                    error=true;
-                }
-                else {
-                    $('.item-error').hide();
-                    $('.price').css('border', 'none');
-                }
+                
                 if (error == true){
                     return;
                 }

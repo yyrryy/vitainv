@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.views.generic import FormView, TemplateView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.db.models import Sum
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,6 +12,9 @@ from pis_com.forms import CustomerForm
 from pis_ledger.forms import LedgerForm
 from  pis_ledger.forms import Ledger
 from pis_sales.models import SalesHistory
+
+
+
 
 class AddNewLedger(FormView):
     form_class = CustomerForm
@@ -101,7 +104,7 @@ class AddLedger(FormView):
 
 class CustomerLedgerView(TemplateView):
     template_name = 'ledger/customer_ledger_list.html'
-
+    print('RR')
     def dispatch(self, request, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return HttpResponseRedirect(reverse('login'))
@@ -149,7 +152,7 @@ class CustomerLedgerView(TemplateView):
 
             customer_ledger.append(customer_data)
 
-        ledgers = customer.customer_ledger.filter(amount__gt=0).all()
+        ledgers = Ledger.objects.all()
         if ledgers:
             grand_ledger = ledgers.aggregate(Sum('amount'))
             grand_ledger = float(grand_ledger.get('amount__sum') or 0)
@@ -164,7 +167,7 @@ class CustomerLedgerView(TemplateView):
         context.update({
             'customer_ledgers': customer_ledger,
             'total_remaining_amount': total_remaining_amount,
-            'title': 'Liste des clients'
+            'title': 'لائحة الزبناء'
         })
 
         return context
@@ -219,7 +222,7 @@ class CustomerLedgerDetailsView(TemplateView):
             'ledger_total': '%g' % ledger_total,
             'payment_total': '%g' % payment_total,
             'remaining_amount': '%g' % (ledger_total - payment_total),
-            'title': 'Détails du client',
+            'title': 'سجل الزبون',
             'clientproducts':SalesHistory.objects.filter(customer=customer)
         })
 

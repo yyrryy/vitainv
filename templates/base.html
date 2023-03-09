@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="fr" xmlns="http://www.w3.org/1999/html" data-bs-theme="dark">
 {% load static %}
 {% load template_tags %}
 <head>
-    <link rel="apple-touch-icon" sizes="180x180" href="/media/images/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/media/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/media/images/favicon-16x16.png">
-    <link rel="manifest" href="/media/images/site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+    <link rel="manifest" href="/static/img/site.webmanifest">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <title>
         {% if title %} {{title}} {% else %}
-        Management de stock
+        القائمة الرئيسية
         {% endif %}
     </title>
 
@@ -94,11 +94,22 @@
                 <li class="nav-item ">
                     <a tabindex="logout" class="nav-link" href="{% url 'logout' %}">الخروج</a>
                 </li>
-                <li class="nav-items">
-                  <a href="{% url 'product:supply' %}" class="nav-link">
-                      ادخال السلع
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    الموردين
                   </a>
-                </li>
+                  <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="{% url 'product:supply' %}">
+                        ادخال السلع
+                      </a></li>
+                      <li><a class="dropdown-item" href="{% url 'product:supplierslist' %}">
+                        لائحة الموردين
+                      </a></li>
+                      <li><a class="dropdown-item" href="{% url 'product:bonsentrees' %}">
+                         فواتير الادخال
+                      </a></li>
+                      
+                  </ul>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       التقارير

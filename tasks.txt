@@ -10,7 +10,6 @@ then assign it to retailer-user in retailer model
 
 
 
-
-
-create form to add categories
-jard lm5won
+before applying in vita:
+edit direction after add invoice
+edit lists of invoice

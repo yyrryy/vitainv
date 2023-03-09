@@ -8,7 +8,7 @@ from django.urls import reverse, reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.db.models import Sum, F, DecimalField, ExpressionWrapper, Q
-from pis_product.models import PurchasedProduct, ExtraItems, ClaimedProduct,StockOut, StockIn, Product, ProductDetail, Category, SubCategory, Supplier, Itemsbysupplier
+from pis_product.models import PurchasedProduct, ExtraItems, ClaimedProduct,StockOut, StockIn, Product, ProductDetail, Category, SubCategory, Supplier, Itemsbysupplier, Avancesbon
 from pis_product.forms import (
     ProductForm, ProductDetailsForm, ClaimedProductForm,StockDetailsForm,StockOutForm)
 from django.utils import timezone
@@ -18,9 +18,24 @@ from pis_retailer.models import Retailer
 from django.db.models import Count
 from django.db import transaction
 from datetime import datetime
+from pis_sales.models import SalesHistory
+from pis_com.models import Customer
 
 this_year = datetime.now().year
 this_month = datetime.now().month
+
+
+def sitemap(request):
+    pass
+
+# add new ledger from modal
+@csrf_exempt
+def addclient(request):
+    name=request.POST.get('name')
+    phone=request.POST.get('phone') or 0000000000
+    ice=request.POST.get('ice') or None
+    Customer.objects.create(customer_name=name,customer_phone=phone,address=ice, retailer=Retailer.objects.get(id=request.user.retailer_user.retailer.id))
+    return JsonResponse({'status':True})
 
 
 def productslistbycategory(request):
@@ -35,7 +50,7 @@ def productslistbycategory(request):
     ctx={
         'parents':parents,
         'categories':categories,
-        'title':'Liste Produit - Categories',
+        'title':'لائحة المنتجات بالتصنيف',
         'children':cc,
         #first id to put it in the form of adding bulk
         'firstid':first
@@ -54,7 +69,6 @@ def getproductsbycategory(request):
     # category = Category.objects.get(pk=request.POST.get('category'))
     # products = category.product.filter(category=category)[:10]
     # get ten products from the category
-    print(request.POST.get('category'))
     products = Product.objects.filter(category__pk=request.POST.get('category'))
     ctx={
         'products':products,
@@ -79,7 +93,7 @@ def searchproductsincategory(request):
 @csrf_exempt
 def addbulkcategory(request, id):
     sub=Category.objects.get(pk=id)
-    myfile=request.FILES[next(iter(request.FILES))]
+    myfile=request.FILES["excel_file"]
     retailer=Retailer.objects.get(id=request.user.retailer_user.retailer.id)
     df = pd.read_excel(myfile)
     df = df.fillna('-')
@@ -104,7 +118,6 @@ def addbulkcategory(request, id):
 def addcategory(request):
     category=request.POST.get('category')
     parent=None if request.POST.get('parent')=='0' else Category.objects.get(pk=request.POST.get('parent'))
-    print(category, request.POST.get('parent')=='0')
     Category.objects.create(name=category, parent=parent)
     return redirect('product:productslistbycategory')
 
@@ -114,8 +127,6 @@ def deletecategory(request, id):
     return redirect('product:categories')
     
 
-def ajaxcalls(request):
-    pass
 
 @csrf_exempt
 def product_search(request):
@@ -159,7 +170,7 @@ def addbulk(request):
     return redirect('index')
 
 def lowstock(request):
-    products = Product.objects.all()
+    products = Product.objects.filter()
     low=[]
     for i in products:
         if i.product_available_items()<=10:
@@ -201,7 +212,7 @@ def addoneproduct(request):
     #         'id':product.id
     #     }
     # })
-    return redirect('index')
+    return redirect('product:productslistbycategory')
 
 
 
@@ -253,14 +264,15 @@ def producthistory(request, id):
     stockout=PurchasedProduct.objects.filter(product=product)
     totalin=pr.aggregate(Sum('quantity')).get('quantity__sum')
     totalcost=round(float(totalin)*float(product.pr_achat), 2)
-    ctx={ 'title':'Historique du produit', 'stockin':pr, 'product':product,  'totalin':totalin, 'totalcost':totalcost, 'netprofit':0}
+    ctx={ 'title':'تفاصيل المنتج', 'stockin':pr, 'product':product,  'totalin':totalin, 'totalcost':totalcost, 'netprofit':0, 'unitcost':totalcost/totalin}
     if stockout:
         totalamountout=stockout.aggregate(Sum('purchase_amount')).get('purchase_amount__sum')
         ctx.update({
             'stockout':stockout,
             'totalamountout':round(totalamountout, 2),
             'totalout':stockout.aggregate(Sum('quantity')).get('quantity__sum'),
-            'netprofit':round(float(totalamountout)-float(totalcost), 2)
+            'netprofit':round(float(totalamountout)-float(totalcost), 2),
+            'rest':totalin-stockout.aggregate(Sum('quantity')).get('quantity__sum'), 'percentage':round(stockout.aggregate(Sum('quantity')).get('quantity__sum')*100/totalin),
         })
     else:
         ctx.update({
@@ -271,40 +283,39 @@ def producthistory(request, id):
 
 
 def reports(request):
-    return render(request, 'products/reports.html', {'title':'Rapports'})
+    return render(request, 'products/reports.html', {'title':'التقارير'})
 
 
 def reportnetprofit(request):
     year=this_year if request.POST.get('year')=='0' else request.POST.get('year')
     month=False if request.POST.get('month')=='0' else request.POST.get('month')
-    print(month, year)
     if month:
-        totalprofit=round(PurchasedProduct.objects.filter(
+        totalprofit=round(SalesHistory.objects.filter(
             created_at__year=year, created_at__month=month
             ).aggregate(
-            total_revenue=Sum('purchase_amount')
+            total_revenue=Sum('paid_amount')
         )['total_revenue'] or 0, 2)
 
-        totalcost=Product.objects.filter(
+        totalcost=round(Product.objects.filter(
             stockin_product__dated_order__year=year, stockin_product__dated_order__month=month
             ).annotate(
                 total_items=Sum('stockin_product__quantity')
             ).aggregate(
                 total_cost=ExpressionWrapper(Sum(F('pr_achat') * F('total_items'), output_field=DecimalField()), output_field=DecimalField())
-            )['total_cost'] or 0
+            )['total_cost'] or 0, 2)
     else:
-        totalprofit=round(PurchasedProduct.objects.filter(
+        totalprofit=round(SalesHistory.objects.filter(
             created_at__year=year
             ).aggregate(
-            total_revenue=Sum('purchase_amount')
+            total_revenue=Sum('paid_amount')
         )['total_revenue'] or 0, 2)
-        totalcost=Product.objects.filter(
+        totalcost=round(Product.objects.filter(
             stockin_product__dated_order__year=year
             ).annotate(
                 total_items=Sum('stockin_product__quantity')
             ).aggregate(
                 total_cost=ExpressionWrapper(Sum(F('pr_achat') * F('total_items'), output_field=DecimalField()), output_field=DecimalField())
-            )['total_cost'] or 0
+            )['total_cost'] or 0, 2)
     
 
     
@@ -389,7 +400,7 @@ def downranking(request):
     })
 
 def relve(request):
-    products=Product.objects.all()
+    products=request.user.retailer_user.retailer.retailer_product.all()
     return render(request, 'products/relve.html', {'title': 'جرد المخزون', 'products':products})
 
 
@@ -397,8 +408,7 @@ def statsofrelve(request):
     year=this_year if request.POST.get('year')=='0' else request.POST.get('year')
     month=False if request.POST.get('month')=='0' else request.POST.get('month')
     product_data = []
-    products=Product.objects.all()
-    print(month)
+    products=request.user.retailer_user.retailer.retailer_product.all()
     # Loop through each product
     for product in products:
         if month:
@@ -458,28 +468,70 @@ def statsofrelve(request):
                 'total_cost': total_cost,
                 'net_profit': net_profit,
             })
+    sorted_list = sorted(product_data, key=lambda k: k['total_profit'], reverse=True)
 
     return JsonResponse({
-        'data':render(request, 'products/relvestats.html', {"products":product_data}).content.decode('utf-8')
+        'data':render(request, 'products/relvestats.html', {"products":sorted_list}).content.decode('utf-8')
     })
 
 
+def dailystatsstock(request):
+    date=request.POST.get('date')
+    product_data = []
+    products=request.user.retailer_user.retailer.retailer_product.all()
+    # Loop through each product
+    for product in products:
+        # Get the available and sold items for the product
+        totalitems=StockIn.objects.filter(
+            product=product
+        ).aggregate(Sum('quantity'))['quantity__sum'] or 0   
+        available_items = product.product_available_items()
+        sold_items = PurchasedProduct.objects.filter(
+            product=product, created_at__date=date
+        ).aggregate(Sum('quantity'))['quantity__sum'] or 0
+
+        # Calculate the total cost and total profit for the product
+        total_cost = round(float(product.pr_achat) * float(totalitems), 2)
+        total_profit = PurchasedProduct.objects.filter(
+            product=product, created_at__date=date
+        ).aggregate(Sum('purchase_amount'))['purchase_amount__sum'] or 0
+        
+        # Calculate the net profit for the product
+        net_profit = round(float(total_profit) - float(total_cost), 2)
+
+        # Add the product data to the list
+        product_data.append({
+            'id': product.id,
+            'name': product.name,
+            'available_items': available_items,
+            'sold_items': sold_items,
+            'total_profit': total_profit,
+            'total_cost': total_cost,
+            'net_profit': net_profit,
+        })
+    sorted_list = sorted(product_data, key=lambda k: k['total_profit'], reverse=True)
+
+    return JsonResponse({
+        'data':render(request, 'products/relvestats.html', {"products":sorted_list}).content.decode('utf-8')
+    })
 def supply(request):
     suppliers=Supplier.objects.all()
+
     return render(request, 'products/supply.html', {'title':'ادخال السلع', 'suppliers':suppliers})
 
 
 def addsupply(request):
-    
+    nbon=request.POST.get('nbon')
     items = json.loads(request.POST.get('items'))
-    reciept=Itemsbysupplier.objects.create(supplier=Supplier.objects.get(pk=request.POST.get('supplier')), items=request.POST.get('items'), total=request.POST.get('total'))
+    reciept=Itemsbysupplier.objects.create(supplier=Supplier.objects.get(pk=request.POST.get('supplier')), items=request.POST.get('items'), total=request.POST.get('total'), nbon=nbon, rest=request.POST.get('total'))
     with transaction.atomic():
         for i in items: 
             try:
                 item=i.get('item_id')
                 product = Product.objects.get(pk=item)
-                print(product)
-                product.pr_achat=float(i['price'])
+                print(int(i['price']))
+                if(not int(i['price'])==0):
+                    product.pr_achat=float(i['price'])
                 # or get the average pr_achat
                 #product.pr_achat=round((float(product.pr_achat)+float(i['price']))/2, 2)
 
@@ -497,23 +549,76 @@ def addsupply(request):
             'status': True,
         })
 
-def supplierslist(request, id):
+def bonentree(request, id):
     itemsbysupplier = json.loads(Itemsbysupplier.objects.get(id=id).items)
     
-    print(itemsbysupplier)
-    print(type(itemsbysupplier))
-    return render(request, 'products/supplierslist.html', {
+    return render(request, 'products/bonentree.html', {
         'suppliers':Supplier.objects.all(), 
         'items':itemsbysupplier,
         'title':'معلومات فاتورة الدخول',
-        'bon':Itemsbysupplier.objects.get(id=id)
+        'bon':Itemsbysupplier.objects.get(id=id),
+        'avances':Avancesbon.objects.filter(bon=id)
+    })
+
+def bonsentrees(request):
+    bb=Itemsbysupplier.objects.all().order_by('-date')
+    print(bb.values())
+    return render(request, 'products/supplierslist.html', {
+        'title':'لائحة فزاتير الموردين',
+        'bonslist':bb,
+        # bons is true to add condition in template to only use one teplate for suppliers list and bons list
+        'bons':True
+    })
+
+def supplierslist(request):
+        
+    suppliers=Supplier.objects.all()
+    supplier_data = []
+    for supplier in suppliers:
+        rest = Itemsbysupplier.objects.filter(supplier=supplier).aggregate(rest=Sum('rest'))['rest'] or 0
+        supplier_data.append({'id':supplier.id, 'name':supplier.name, 'details':supplier.detals, 'rest':rest})
+    print(supplier_data)
+    return render(request, 'products/supplierslist.html', {
+        'title':'لائحة الموردين',
+        'suppliers':supplier_data
+    })
+
+def supplierinfo(request, id):
+    
+
+    supplier=Supplier.objects.get(pk=id)
+    bons=Itemsbysupplier.objects.filter(supplier=supplier)
+    return render (request, 'products/supplierinfo.html', {
+        'title':'Bon entree',
+        'bons':bons,
+        'supplier':supplier
+    })
+
+def addpaymentsupplier(request, id):
+    amount=request.POST.get('amount')
+    details=request.POST.get('details')
+    bon=Itemsbysupplier.objects.get(pk=id)
+    avances=Avancesbon.objects.filter(bon=bon).aggregate(Sum('avance'))['avance__sum']
+    if avances:
+        avances=float(avances)+float(amount)
+    else:avances=amount
+    bon.rest=float(bon.total)-float(avances)
+    bon.save()
+    Avancesbon.objects.create(
+        bon=bon,
+        avance=amount,
+        details=details,
+    )
+    #return reverse('product:bonentree', kwargs={'id':bon.id})
+    return JsonResponse({
+        'rr':'rest'
     })
 
 def addsupplier(request):
     try:
         name=request.POST.get('name')
-        Supplier.objects.create(name=name)
-        print(name)
+        details=request.POST.get('details')
+        Supplier.objects.create(name=name, detals=details)
         return JsonResponse({
             'data':'تمت الاضافة'
         })
@@ -521,6 +626,62 @@ def addsupplier(request):
         return JsonResponse({
             'data':'حدث خطأ'
         })
+
+def dailystats(request):
+    date=request.POST.get('date')
+    totalprofit=round(SalesHistory.objects.filter(
+            created_at__date=date
+            ).aggregate(
+            total_revenue=Sum('paid_amount')
+        )['total_revenue'] or 0, 2)
+    totalcost=round(Product.objects.filter(
+            stockin_product__dated_order__date=date
+            ).annotate(
+                total_items=Sum('stockin_product__quantity')
+            ).aggregate(
+                total_cost=ExpressionWrapper(Sum(F('pr_achat') * F('total_items'), output_field=DecimalField()), output_field=DecimalField())
+            )['total_cost'] or 0, 2)
+    return JsonResponse({
+        'totalprofit':totalprofit,
+        'totalcost':totalcost,
+        'netprofit':totalprofit-totalcost
+    })
+
+def dailyproductsranking(request):
+    date=request.POST.get('date')
+    products = (
+    PurchasedProduct.objects.filter(
+        created_at__date=date
+        ).values('product')
+    .annotate(
+        total_quantity=Sum('quantity'),
+        total_purchase_amount=Sum('purchase_amount')
+    )
+    .order_by('-total_quantity')
+    .values('product__name', 'total_quantity', 'total_purchase_amount')
+    )
+    return JsonResponse({
+        'data':render(request, 'products/productsranking.html', {'products':products}).content.decode('utf-8')
+    })
+
+
+def dailyproductsrankingdown(request):
+    date=request.POST.get('date')
+    products = (
+    PurchasedProduct.objects.filter(
+        created_at__date=date
+        ).values('product')
+    .annotate(
+        total_quantity=Sum('quantity'),
+        total_purchase_amount=Sum('purchase_amount')
+    )
+    .order_by('-total_quantity')
+    .values('product__name', 'total_quantity', 'total_purchase_amount')
+    )
+    return JsonResponse({
+        'data':render(request, 'products/productsranking.html', {'products':products}).content.decode('utf-8')
+    })
+
 
 
 

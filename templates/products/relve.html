@@ -5,17 +5,24 @@
 
 {% block content %}
 <div class="filterholder p-3 row text-center">
-    <div class="col-4">
+    <div class="col-md-3">
+        <input type="date" class="form-control date">
+    </div>
+    <div class="col-md-3">
         <select class="form-select" name="year1">
-            <option value="0">--</option>
+            <option value="0">
+                السنة
+            </option>
             <option value="2023">2023</option>
             <option value="2024">2024</option>
             <option value="2025">2025</option>
         </select>
     </div>
-    <div class="col-4">
+    <div class="col-md-3">
         <select class="form-select col-4" name="month1">
-            <option value="0">--</option>
+            <option value="0">
+                الشهر
+            </option>
             <option value="1">يناير</option>
             <option value="2">فبراير</option>
             <option value="3">مارس</option>
@@ -30,7 +37,7 @@
             <option value="12">ديسمبر</option>
         </select>
     </div>
-    <button class="findnetprofit btn btn-primary fa fa-search col-4">
+    <button class="findnetprofit btn btn-primary fa fa-search col-md-3">
     </button>
 </div>
 <div class="tableholder position-relative">
@@ -70,7 +77,8 @@
 
 {% block scripts %}
 <script>
-    $.post("{% url 'product:statsofrelve' %}",{
+    $(document).ready(()=>{
+        $.post("{% url 'product:statsofrelve' %}",{
                 'year': $('select[name="year1"]').val(),
                 'month': $('select[name="month1"]').val(),
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
@@ -78,19 +86,41 @@
                 $('.loadingnumbers').removeClass('d-flex').addClass('d-none');
                 $('.stats').html(data.data);
                 
-            })
-    $('.findnetprofit').on('click', ()=>{
+        })
+        $('.findnetprofit').on('click', ()=>{
+                $('.loadingnumbers').removeClass('d-none').addClass('d-flex');
+                $.post("{% url 'product:statsofrelve' %}",{
+                    'year': $('select[name="year1"]').val(),
+                    'month': $('select[name="month1"]').val(),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data, status){
+                    $('.loadingnumbers').removeClass('d-flex').addClass('d-none');
+                    $('.stats').html(data.data);
+                    
+                })
+        })
+
+    
+    // daily
+    $('.date').on('change', function () {
+        if ($(this).val() == '') {
+            return
+            
+        } 
+        else {
             $('.loadingnumbers').removeClass('d-none').addClass('d-flex');
-            $.post("{% url 'product:statsofrelve' %}",{
-                'year': $('select[name="year1"]').val(),
-                'month': $('select[name="month1"]').val(),
+            $.post("{% url 'product:dailystatsstock' %}",{
+                'date': $(this).val(),
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             }, function(data, status){
                 $('.loadingnumbers').removeClass('d-flex').addClass('d-none');
                 $('.stats').html(data.data);
-                
             })
+        }
     })
 
+
+    })
+    
 </script>
 {% endblock %}

@@ -228,7 +228,7 @@ class CreateInvoiceView(FormView):
             'products': products,
             'customers': customers,
             'present_date': timezone.now().date(),
-            'title':'Creer un bon'
+            'title':'اضافة فاتورة جديدة'
         })
         return context
 
@@ -350,7 +350,6 @@ class GenerateInvoiceAPIView(View):
 
             for item in items:
                 item_id = item.get('item_id')
-                print(item_id)
                 try:
                     product = Product.objects.get(
                         pk=item.get('item_id'),
@@ -361,7 +360,7 @@ class GenerateInvoiceAPIView(View):
                         'invoice': self.invoice.id,
                         'quantity': item.get('qty'),
                         'price': item.get('price'),
-                        'discount_percentage': item.get('perdiscount'),
+                        # 'discount_percentage': item.get('perdiscount'),
                         'purchase_amount': item.get('total'),
                     }
                     form = PurchasedProductForm(form_kwargs)
@@ -436,7 +435,7 @@ class InvoiceDetailView(TemplateView):
             'invoice': invoice,
             'product_details': invoice.product_details,
             'extra_items_details': invoice.extra_items,
-            'title':"Details du facture "
+            'title':"تفاصيل الفاتورة"
         })
         return context
 
@@ -467,7 +466,7 @@ class InvoicesList(ListView):
     def get_context_data(self, **kwargs):
         context = super(InvoicesList, self).get_context_data(**kwargs)
         context.update({
-            'title':'Liste des Bons',
+            'title':'لائحة الفواتير',
         })
         return context
 
