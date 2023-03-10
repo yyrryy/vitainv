@@ -30,7 +30,7 @@ DEBUG = True
 
 
 if DEBUG:
-    ALLOWED_HOSTS = ['165.22.207.117', 'localhost']
+    ALLOWED_HOSTS = ['167.71.79.205', 'localhost']
     DATABASES = {
         'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -84,26 +84,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inventory.wsgi.application'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/django/app.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'INFO',
-        },
-        'myapp': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-        },
-    },
-}
+
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
