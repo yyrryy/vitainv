@@ -197,6 +197,7 @@
                 $('.customererror').show();
                 return false;
             }else{
+                $('.addclientbtn').addClass('disabled')
                 $.post(
                     '{% url "product:addclient" %}',
                     {

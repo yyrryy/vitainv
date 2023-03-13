@@ -4,33 +4,38 @@
 
 {% block content %}
 <!-- addsupplier modal -->
-<div class="modal fade" id="addsuppliermodal" tabindex="-1" aria-labelledby="updtaeproductLabel" aria-hidden="true">
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        
-        <div class="modal-body">
-            <form class="form-horizontal addsupplierform" action="" method="post" autocomplete="off">
-                <div class="form-group">
-                    <div class="col-sm-12">
-                        {% csrf_token %}
-                        <label><strong>الاسم</strong></label>
-                        <input type="text" class="form-control product_name" name="name" required><br>
-                        
-                        
-                        <br>
-                        <textarea class="form-control" name="details" id="" cols="30" rows="10"></textarea>
-
-                        <br>
-                        <button type="submit" id="save" class="btn btn-primary product-submit-btn w-100" style="float: right" >Enregister</button>
+        <div class="modal-content">
+            
+            <div class="modal-body">
+                <form class="form-horizontal add-ledger-form addsupplierform" action="{% url 'product:addsupplier' %}" method="post" autocomplete="off">
+                    <div class="form-group">
+                            {% csrf_token %}
+                            <label>
+                                <strong>الاسم</strong>
+                            </label>
+                            <input type="text" class="form-control customer" name="name" >
+                            <br>
+                            <label>
+                                <strong>معلومات</strong>
+                            </label>
+                            <textarea type="text" class="form-control customer_phone" name="details" ></textarea>
+                            <br>
+                            
+                            <br>
+                            
+                            <br>
+                            <input type="hidden" name="retailer" value="{{ request.user.retailer_user.retailer.id }}">
+                            <button type="button" id="save" class="btn btn-primary ledger-submit-btn" style="float: right" id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i>Processing">اضافة </button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           
         </div>
-      </div>
     </div>
 </div>
 {% if bons %}
@@ -88,7 +93,7 @@
 {% else %}
 <div class="col-md-12">
     <br>
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addsuppliermodal">
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
         اضافة +
     </button>
     <br><br><br>
@@ -137,37 +142,80 @@
 </div>
 {% endif %}
 <script>
-    $(document).ready(function(){
-        $('.extra-items').on("keyup", function() {
-            var value = $(this).val().toLowerCase();
-            $(".ledger-table-body tr").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
-        });
-    })
     $('document').ready(function () {
-        $('.addsupplierform').on('submit', function (e) {
-            $('product-sub-btn').attr('disabled', true)
-            e.preventDefault()
-            $.ajax({
-                url: "{% url 'product:addsupplier' %}",
-                type: "POST",
-                data: {
-                    'name': $('[name="name"]').val(),
-                    'details': $('[name="details"]').val(),
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                success: function (data) {
+        $('.ledger-submit-btn').on ('click', function () {
+            $(this).addClass('disabled');
+            $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Loading...');
+            var error = false;
+
+            if ($('.customer').val() ==""){
+                $('.customer-error').show();
+                error= true;
+            }
+            else {
+                $('.customer-error').hide();
+                error=false;
+            }
+            
+            if (error == true ) {
+                $(this).html('اضافة');
+                $(this).removeClass('disabled');
+                return;
+            }
+            if (error == false) {
+                $.ajax({
+                    url: "{% url 'product:addsupplier' %}",
+                    type: "POST",
+                    data: {
+                        'name': $('[name="name"]').val(),
+                        'details': $('[name="details"]').val(),
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        
+                        $('.addsupplierform').trigger('reset')
+                        $('#exampleModal').modal('hide')
+                        alert(data.data)
+                        // refresh
+                        location.reload()
+                        
+                    },
+                })
+            }
+    });
+    //     $('product-sub-btn').on ('click', function () {
+
+    //         if ($('[name=name]').val()==''){
+    //             return
+    //         }
+    //         else{
+    //             console.log('should be disabled')
+    //             $(this).addClass('disabled');
+    //         }
+    //     })
+    //     $('.addsupplierform').on('submit', function (e) {
+    //         e.preventDefault()
+    //         $('product-sub-btn').addClass('disabled')
+    //         $.ajax({
+    //             url: "{% url 'product:addsupplier' %}",
+    //             type: "POST",
+    //             data: {
+    //                 'name': $('[name="name"]').val(),
+    //                 'details': $('[name="details"]').val(),
+    //                 'csrfmiddlewaretoken': '{{ csrf_token }}'
+    //             },
+    //             success: function (data) {
                     
-                    $('.addsupplierform').trigger('reset')
-                    $('#addsuppliermodal').modal('hide')
-                    alert(data.data)
-                    // refresh
-                    location.reload()
+    //                 $('.addsupplierform').trigger('reset')
+    //                 $('#addsuppliermodal').modal('hide')
+    //                 alert(data.data)
+    //                 // refresh
+    //                 location.reload()
                     
-                },
-            })
-        })
+    //             },
+    //         })
+    //     })
+    // 
     });
 
     </script>

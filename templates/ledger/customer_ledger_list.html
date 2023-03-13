@@ -7,47 +7,46 @@
 <!-- add one client model -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        
-        <div class="modal-body">
-            <form class="form-horizontal add-ledger-form" action="{% url 'ledger:add_new_ledger' %}" method="post" autocomplete="off">
-                <div class="form-group">
-                        {% csrf_token %}
-                        <label>
-                            <strong>الاسم</strong>
-                          </label>
-                          <span class="customer-existing" style="color: red; display: none">Client exist deja</span>
-                          <span class="customer-error" style="color: red; display: none">Obligatoire</span>
-                          <input type="text" class="form-control customer" name="customer_name" >
-                          <br>
-                          <label>
-                            <strong>الهاتف</strong>
-                          </label>
-                          <span class="customer-phone-error" style="color: red; display: none">Obligatoire</span>
-                          <input type="text" class="form-control customer_phone" name="customer_phone" >
-                          <label>
-                            <strong>ICE</strong>
-                          </label>
-                          <span class="customer-phone-error" style="color: red; display: none">Obligatoire</span>
-                          <input type="text" class="form-control" name="address" >
-                          <br>
-                          
-                          <br>
-                          
-                          <br>
-                          <input type="hidden" name="retailer" value="{{ request.user.retailer_user.retailer.id }}">
-                          <button type="button" id="save" class="btn btn-primary ledger-submit-btn" style="float: right" id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i>Processing Order">Enregistrer </button>
+        <div class="modal-content">
+            
+            <div class="modal-body">
+                <form class="form-horizontal add-ledger-form" action="{% url 'ledger:add_new_ledger' %}" method="post" autocomplete="off">
+                    <div class="form-group">
+                            {% csrf_token %}
+                            <label>
+                                <strong>الاسم</strong>
+                            </label>
+                            <span class="customer-existing" style="color: red; display: none">Client exist deja</span>
+                            <span class="customer-error" style="color: red; display: none">Obligatoire</span>
+                            <input type="text" class="form-control customer" name="customer_name" >
+                            <br>
+                            <label>
+                                <strong>الهاتف</strong>
+                            </label>
+                            <span class="customer-phone-error" style="color: red; display: none">Obligatoire</span>
+                            <input type="text" class="form-control customer_phone" name="customer_phone" >
+                            <label>
+                                <strong>ICE</strong>
+                            </label>
+                            <span class="customer-phone-error" style="color: red; display: none">Obligatoire</span>
+                            <input type="text" class="form-control" name="address" >
+                            <br>
+                            
+                            <br>
+                            
+                            <br>
+                            <input type="hidden" name="retailer" value="{{ request.user.retailer_user.retailer.id }}">
+                            <button type="button" id="save" class="btn btn-primary ledger-submit-btn" style="float: right" id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i>Processing">اضافة </button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           
         </div>
-      </div>
     </div>
-<div>
+</div>
     <br>
     <button type="button" class="btn btn-success addoneproduct" data-bs-toggle="modal" data-bs-target="#exampleModal">
         اضافة +
@@ -121,16 +120,13 @@ $('.ledger-submit-btn').on ('click', function () {
     }
     
     if (error == true ) {
+        $(this).html('اضافة');
         $(this).removeClass('disabled');
         return;
     }
     if (error == false) {
         $('.add-ledger-form').submit();
     }
-     else {
-         $(this).removeClass('disabled');
-         return;
-     }
 });
 
 $('.customer').keyup(function () {

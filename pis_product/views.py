@@ -575,7 +575,8 @@ def supplierslist(request):
     for supplier in suppliers:
         rest = Itemsbysupplier.objects.filter(supplier=supplier).aggregate(rest=Sum('rest'))['rest'] or 0
         supplier_data.append({'id':supplier.id, 'name':supplier.name, 'details':supplier.detals, 'rest':rest})
-    
+    # order suppliers_data descending by rest
+    supplier_data = sorted(supplier_data, key=lambda k: k['rest'], reverse=True)
     return render(request, 'products/supplierslist.html', {
         'title':'لائحة الموردين',
         'suppliers':supplier_data
