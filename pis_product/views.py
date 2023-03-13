@@ -529,7 +529,6 @@ def addsupply(request):
             try:
                 item=i.get('item_id')
                 product = Product.objects.get(pk=item)
-                print(int(i['price']))
                 if(not int(i['price'])==0):
                     product.pr_achat=float(i['price'])
                 # or get the average pr_achat
@@ -562,7 +561,6 @@ def bonentree(request, id):
 
 def bonsentrees(request):
     bb=Itemsbysupplier.objects.all().order_by('-date')
-    print(bb.values())
     return render(request, 'products/supplierslist.html', {
         'title':'لائحة فزاتير الموردين',
         'bonslist':bb,
@@ -577,7 +575,7 @@ def supplierslist(request):
     for supplier in suppliers:
         rest = Itemsbysupplier.objects.filter(supplier=supplier).aggregate(rest=Sum('rest'))['rest'] or 0
         supplier_data.append({'id':supplier.id, 'name':supplier.name, 'details':supplier.detals, 'rest':rest})
-    print(supplier_data)
+    
     return render(request, 'products/supplierslist.html', {
         'title':'لائحة الموردين',
         'suppliers':supplier_data

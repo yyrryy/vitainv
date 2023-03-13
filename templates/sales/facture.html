@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture_{{inv.receipt_no}}</title>
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+
+</head>
+<body>
+    <div class="text-end">
+        <a class="btn btn-sm btn-info" href="#" data-abc="true" onclick="PrintInvoice('invoice')">
+          <i class="fa fa-print mr-1"></i> Print </a>
+        
+      </div>
+    <div class="container-fluid mt-100 mb-100">
+        <div id="ui-view">
+          <div class=" d-flex flex-column" id="invoice">
+            <div class="card" >
+              <div class="card-header d-flex justify-content-between">
+                <p>
+                    Invoice <strong>#{{inv.receipt_no}}</strong>
+                </p>
+                <p>
+                    {{inv.created_at|date:'d/m/Y'}}
+                </p>
+                
+              </div>
+              <div class="card-body">
+                <div class="d-flex mb-4 justify-content-between">
+                  <div class="">
+                    <div>
+                      <strong>Test business.</strong>
+                    </div>
+                    <div>Adresse</div>
+                    <div>Phone: 0555555555</div>
+                  </div>
+                  <div class="">
+                    <div>
+                        Client: 
+                      <strong>{{ inv.customer.customer_name }}.</strong>
+                    </div>
+                    <div>{{ inv.customer.customer_phone }}</div>
+                    <div>ICE: {{ inv.customer.address }}</div>
+                  </div>
+                </div>
+                <div class="table-responsive-sm">
+                  <table class="table table-striped table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th class="right">Prix unit.</th>
+                        <th class="center">Qté</th> 
+                        <th class="right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in inv.purchased_items.all %}
+                      <tr>
+                        <td class="left">{{i.product.name}}</td>
+                        <td class="center">{{i.price}}</td>
+                        <td >
+                            {{ i.quantity|floatformat:-2}}
+                        </td>
+                        <td >
+                            {{ i.purchase_amount|floatformat:-2 }} 
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td >Total</td>
+                        <td>{{ inv.grand_total|floatformat:-2 }} Dh</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>TVA</td>
+                        <td>{{tva}} Dh</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>Total TTC</td>
+                        <td>{{totalttc}} Dh</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                        
+                    </tfoot>
+                  </table>
+                </div>
+                <!-- <div class="d-flex justify-content-between">
+                    <div>
+                        
+                    </div>
+                  <div class="col-lg-4 ml-auto">
+                    <table class="table table-clear">
+                      <tbody>
+                        <tr>
+                          <td class="left">
+                            <strong>Total (Ht)</strong>
+                          </td>
+                          <td class="right">{{ inv.grand_total|floatformat:-2 }} Dh</td>
+                        </tr>
+                        <tr>
+                          
+                        </tr>
+                        <tr>
+                          <td class="left">
+                            <strong>VAT (20%)</strong>
+                          </td>
+                          <td class="right">{{tva}} Dh</td>
+                        </tr>
+                        <tr>
+                          <td class="left">
+                            <strong>Total TTC</strong>
+                          </td>
+                          <td class="right">
+                            <strong>{{totalttc}} Dh</strong>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    
+
+                  </div>
+                  
+                </div> -->
+                
+              </div>
+            </div>
+            <div class="foooterfacture">
+                <hr>
+                Siege social: test address - Biougra RC: 25937 Taxe professionnelle: 48802831 IF: 52414131 ICE: 003030506000009
+            </div>
+          </div>
+        </div>
+      </div>
+</body>
+<script src="{% static 'js/jquery.min.1.7.js'%}"></script>
+
+<script>
+    function PrintInvoice(divName){
+         var printContents = document.getElementById(divName).innerHTML;
+         var originalContents = document.body.innerHTML;
+         document.body.innerHTML = printContents;
+         $('body').css('font-size', '12px')
+         $('.head').addClass('')
+         $('table').css('font-size', '9px');
+         $("table > thead > tr > th").css('padding', '0px');
+         $("table > tbody > tr > td").css('padding', '0px');
+         $('body').addClass('d-flex flex-column vh-100 p-3')
+         $('.foooterfacture').addClass('mt-auto');
+         window.print();
+         document.body.innerHTML = originalContents;
+    }
+</script>
+</html>

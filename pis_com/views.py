@@ -102,7 +102,6 @@ class HomePageView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(HomePageView, self).get_context_data(**kwargs)
-        print(context)
         return context
 
     # def dispatch(self, request, *args, **kwargs):

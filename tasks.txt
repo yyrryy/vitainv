@@ -13,3 +13,45 @@ then assign it to retailer-user in retailer model
 before applying in vita:
 edit direction after add invoice
 edit lists of invoice
+
+
+sudo nano /etc/systemd/system/gunicorn.service
+
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+[Service]
+User=yurey
+Group=www-data
+WorkingDirectory=/home/yurey/myprojectdir
+ExecStart=/home/yurey/myprojectdir/myprojectenv/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          inventory.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+## sites available ##
+server {
+    listen 80;
+    server_name 167.71.79.205;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/yurey/myprojectdir;
+    }
+
+    location / {
+        ##add this to prevent 502 error
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+    }
+}

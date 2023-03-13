@@ -29,73 +29,74 @@ from pis_product.models import PurchasedProduct
 from django.conf import settings
 # with open(settings.MEDIA_ROOT+'/logo.png', 'rb') as f:
 #     logo=Image.open(f)
-
+from django.shortcuts import render
 logo_path = os.path.join(settings.MEDIA_ROOT, 'logo.png')
 
 
 def facture(request, pk):
     inv=SalesHistory.objects.get(id=pk)
     purchased=PurchasedProduct.objects.filter(invoice=inv)
-    buffer = BytesIO()
+    return render(request, 'sales/facture.html', {'inv':inv, 'tva':round(float(inv.grand_total)*0.2, 2), 'totalttc':round(float(inv.grand_total)*1.2, 2)})
+    # buffer = BytesIO()
 
-    # Create the PDF object, using the buffer as its "file."
-    p = canvas.Canvas(buffer)
-    # make it A4 size
-    p.setPageSize(A4)
-    p.setTitle(f"Facture: {inv.receipt_no} ")
-    # write 'Vita drogerie' on the top left corner
-    p.drawImage(logo_path, 10, 700, 150, 150)
-    #p.drawString(15, 770, 'LOGO')
-    #write 'Client' on the top right corner
-    p.setFont("Helvetica", 11)
+    # # Create the PDF object, using the buffer as its "file."
+    # p = canvas.Canvas(buffer)
+    # # make it A4 size
+    # p.setPageSize(A4)
+    # p.setTitle(f"Facture: {inv.receipt_no} ")
+    # # write 'Vita drogerie' on the top left corner
+    # p.drawImage(logo_path, 10, 700, 150, 150)
+    # #p.drawString(15, 770, 'LOGO')
+    # #write 'Client' on the top right corner
+    # p.setFont("Helvetica", 11)
 
-    p.drawString(30, 725, 'test address')
-    p.drawString(30, 710, 'ville ')
-    p.drawString(30, 695, '06 55 55 55 55')
-    p.drawString(420, 800, f"Facture: {inv.receipt_no}")
-    # write 'Address' on the top left corner
-    p.drawString(420, 785, f"Date: {datetime.strftime(inv.created_at, '%d/%m/%Y')} ")
-    p.drawString(420, 720, f"Client: {inv.customer.customer_name} ")
-    p.drawString(420, 705, f"ICE: {inv.customer.address} ")
+    # p.drawString(30, 725, 'test address')
+    # p.drawString(30, 710, 'ville ')
+    # p.drawString(30, 695, '06 55 55 55 55')
+    # p.drawString(420, 800, f"Facture: {inv.receipt_no}")
+    # # write 'Address' on the top left corner
+    # p.drawString(420, 785, f"Date: {datetime.strftime(inv.created_at, '%d/%m/%Y')} ")
+    # p.drawString(420, 720, f"Client: {inv.customer.customer_name} ")
+    # p.drawString(420, 705, f"ICE: {inv.customer.address} ")
 
-    # drow a line
-    # write business name at the bottom
-    # reduce the font size of the code bellow
-    # write 'rrerr' with small font size at the bottom
-    p.setFont("Helvetica", 8)
-    p.drawString(30, 660, 'Article')
-    p.line(30-2, 667, 30-2, 655)
-    p.drawString(350, 660, 'Qté')
-    p.line(350-2, 667, 350-2, 655)
-    p.drawString(420, 660, 'Prix unt.')
-    p.line(420-2, 667, 420-2, 655)
-    p.drawString(490, 660, 'Total')
-    p.line(490-2, 667, 490-2, 655)
-    p.line(30-2, 655, 550, 655)
-    p.setFont("Helvetica", 8)
-    n=640
-    for i in purchased:
-        p.drawString(30, n, i.product.name)
-        p.line(30-2, 655, 30-2, n-5)
-        p.drawString(350, n, str(i.quantity))
-        p.line(350-2, 655, 350-2, n-5)
-        p.drawString(420, n, str(i.price))
-        p.line(420-2, 655, 420-2, n-5)
-        p.drawString(490, n, str(i.purchase_amount))
-        p.line(490-2, 655, 490-2, n-5)
-        p.line(30-2, n-5, 550, n-5)
-        n-=15
-    p.drawString(420, n-15, 'Total HT')
-    p.drawString(490, n-15, str(inv.grand_total))
-    p.line(420, n-20, 550, n-20)
-    p.drawString(420, n-30, 'TVA 20%')
-    p.drawString(490, n-30, str(round(float(inv.grand_total)*0.2, 2)))
-    p.line(420, n-35, 550, n-35)
-    p.drawString(420, n-45, 'TTC')
-    p.drawString(490, n-45, str(round(float(inv.grand_total)*1.2, 2)))
-    p.line(30, 120, 550, 120)
-    p.drawString(30, 100, "Siege social: test address - Biougra")
-    p.drawString(30, 85, "RC: 25937 Taxe professionnelle: 48802831 IF: 52414131 ICE: 003030506000009")
+    # # drow a line
+    # # write business name at the bottom
+    # # reduce the font size of the code bellow
+    # # write 'rrerr' with small font size at the bottom
+    # p.setFont("Helvetica", 8)
+    # p.drawString(30, 660, 'Article')
+    # p.line(30-2, 667, 30-2, 655)
+    # p.drawString(350, 660, 'Qté')
+    # p.line(350-2, 667, 350-2, 655)
+    # p.drawString(420, 660, 'Prix unt.')
+    # p.line(420-2, 667, 420-2, 655)
+    # p.drawString(490, 660, 'Total')
+    # p.line(490-2, 667, 490-2, 655)
+    # p.line(30-2, 655, 550, 655)
+    # p.setFont("Helvetica", 8)
+    # n=640
+    # for i in purchased:
+    #     p.drawString(30, n, i.product.name)
+    #     p.line(30-2, 655, 30-2, n-5)
+    #     p.drawString(350, n, str(i.quantity))
+    #     p.line(350-2, 655, 350-2, n-5)
+    #     p.drawString(420, n, str(i.price))
+    #     p.line(420-2, 655, 420-2, n-5)
+    #     p.drawString(490, n, str(i.purchase_amount))
+    #     p.line(490-2, 655, 490-2, n-5)
+    #     p.line(30-2, n-5, 550, n-5)
+    #     n-=15
+    # p.drawString(420, n-15, 'Total HT')
+    # p.drawString(490, n-15, str(inv.grand_total))
+    # p.line(420, n-20, 550, n-20)
+    # p.drawString(420, n-30, 'TVA 20%')
+    # p.drawString(490, n-30, str(round(float(inv.grand_total)*0.2, 2)))
+    # p.line(420, n-35, 550, n-35)
+    # p.drawString(420, n-45, 'TTC')
+    # p.drawString(490, n-45, str(round(float(inv.grand_total)*1.2, 2)))
+    # p.line(30, 120, 550, 120)
+    # p.drawString(30, 100, "Siege social: test address - Biougra")
+    # p.drawString(30, 85, "RC: 25937 Taxe professionnelle: 48802831 IF: 52414131 ICE: 003030506000009")
     
 
 
@@ -107,104 +108,105 @@ def facture(request, pk):
 
 
 
-    # # Close the PDF object cleanly, and we're done.
-    p.showPage()
-    p.save()
+    # # # Close the PDF object cleanly, and we're done.
+    # p.showPage()
+    # p.save()
 
-    # # FileResponse sets the Content-Disposition header so that browsers
-    # # present the option to save the file.
-    buffer.seek(0)
-    # # return the pdf with intaitle
+    # # # FileResponse sets the Content-Disposition header so that browsers
+    # # # present the option to save the file.
+    # buffer.seek(0)
+    # # # return the pdf with intaitle
     
-    return FileResponse(buffer, as_attachment=True, filename=f'facture{inv.receipt_no}.pdf')
+    # return FileResponse(buffer, as_attachment=True, filename=f'facture{inv.receipt_no}.pdf')
 
 
 def bon(request, pk):
 
     inv=SalesHistory.objects.get(id=pk)
-    purchased=PurchasedProduct.objects.filter(invoice=inv)
-    buffer = BytesIO()
+    return render(request, 'sales/bon.html', {'inv':inv})
+    # purchased=PurchasedProduct.objects.filter(invoice=inv)
+    # buffer = BytesIO()
  
-    # Create the PDF object, using the buffer as its "file."
-    p = canvas.Canvas(buffer)
-    # make it letter size
-    p.setPageSize(letter)
-    p.setTitle(f"Bon de sortie: {inv.receipt_no} ")
-    # write 'Vita drogerie' on the top left corner
-    #draw the logo
-    p.drawImage(logo_path, 10, 685, 120, 120)
-    #p.drawString(15, 770, 'LOGO')
-    p.setFont("Helvetica", 8)
-    p.drawString(15, 725, 'test address')
-    p.drawString(15, 710, 'ville ')
-    p.drawString(15, 695, '06 55 55 ')
-    # write 'Address' on the top left corner
-    p.drawString(330, 770, f"Bon de sortie: {inv.receipt_no} ")
-    p.drawString(330, 755, f"Date: {datetime.strftime(inv.created_at, '%d/%m/%Y')} ")
-    #write 'Client' on the top right corner
-    p.drawString(330, 730, f"Client: {inv.customer.customer_name} ")
+    # # Create the PDF object, using the buffer as its "file."
+    # p = canvas.Canvas(buffer)
+    # # make it letter size
+    # p.setPageSize(letter)
+    # p.setTitle(f"Bon de sortie: {inv.receipt_no} ")
+    # # write 'Vita drogerie' on the top left corner
+    # #draw the logo
+    # p.drawImage(logo_path, 10, 685, 120, 120)
+    # #p.drawString(15, 770, 'LOGO')
+    # p.setFont("Helvetica", 8)
+    # p.drawString(15, 725, 'test address')
+    # p.drawString(15, 710, 'ville ')
+    # p.drawString(15, 695, '06 55 55 ')
+    # # write 'Address' on the top left corner
+    # p.drawString(330, 770, f"Bon de sortie: {inv.receipt_no} ")
+    # p.drawString(330, 755, f"Date: {datetime.strftime(inv.created_at, '%d/%m/%Y')} ")
+    # #write 'Client' on the top right corner
+    # p.drawString(330, 730, f"Client: {inv.customer.customer_name} ")
 
-    # drow a line
-    p.drawString(20, 660, 'Article')
-    p.line(15, 680, 15, 650)
-    p.drawString(272, 660, 'Qté')
-    p.line(270, 680, 270, 650)
-    p.drawString(312, 660, 'Prix unt.')
-    p.line(310, 680, 310, 650)
-    p.drawString(362, 660, 'Total')
-    p.line(360, 680, 360, 650)
-    p.line(15, 650, 550, 650)
-    n=640
-    for i in purchased:
-        p.drawString(20, n, i.product.name)
-        # vertical line
-        p.line(15, 650, 15, n)
-
-        p.drawString(272, n, str(int(i.quantity)))
-        # vertical line
-        p.line(270, 650, 270, n)
-
-        p.drawString(312, n, str(i.price))
-        p.line(310, 650, 310, n)
-
-        p.drawString(362, n, str(i.purchase_amount))
-        p.line(360, 650, 360, n)
-
-        # horizontal line
-        p.line(15, n-2, 550, n-2)
-        n-=15
-    p.drawString(312, n, 'Total:')
-    p.drawString(362, n, str(inv.grand_total))
-    p.line(312, n-2, 550, n-2)
-    # data=[
-    #     ['Article', 'Qté', 'prix unt.', 'Total'],
-
-    # ]
+    # # drow a line
+    # p.drawString(20, 660, 'Article')
+    # p.line(15, 680, 15, 650)
+    # p.drawString(272, 660, 'Qté')
+    # p.line(270, 680, 270, 650)
+    # p.drawString(312, 660, 'Prix unt.')
+    # p.line(310, 680, 310, 650)
+    # p.drawString(362, 660, 'Total')
+    # p.line(360, 680, 360, 650)
+    # p.line(15, 650, 550, 650)
+    # n=640
     # for i in purchased:
-    #     data.append([i.product.name, i.quantity, i.price, i.purchase_amount])
-    # data.append(['', '', 'Total', inv.grand_total],)
-    # table=Table(data, colWidths=[300, 50, 60, 70])
-    # # adjust height of the row
+    #     p.drawString(20, n, i.product.name)
+    #     # vertical line
+    #     p.line(15, 650, 15, n)
 
-    # table.setStyle(TableStyle([
-    #     # make the first row gray background
-    #     ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
-    #     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-    #     ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-    # ]))
-    # table.wrapOn(p, 800, 600)#
-    # print(count)
-    # table.drawOn(p, 30, 500)
-    p.showPage()
-    p.save()
+    #     p.drawString(272, n, str(int(i.quantity)))
+    #     # vertical line
+    #     p.line(270, 650, 270, n)
 
-    # FileResponse sets the Content-Disposition header so that browsers
-    # present the option to save the file.
-    buffer.seek(0)
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="bon_sortie{inv.receipt_no}.pdf"'
-    response.write(buffer.getvalue())
-    return response
+    #     p.drawString(312, n, str(i.price))
+    #     p.line(310, 650, 310, n)
+
+    #     p.drawString(362, n, str(i.purchase_amount))
+    #     p.line(360, 650, 360, n)
+
+    #     # horizontal line
+    #     p.line(15, n-2, 550, n-2)
+    #     n-=15
+    # p.drawString(312, n, 'Total:')
+    # p.drawString(362, n, str(inv.grand_total))
+    # p.line(312, n-2, 550, n-2)
+    # # data=[
+    # #     ['Article', 'Qté', 'prix unt.', 'Total'],
+
+    # # ]
+    # # for i in purchased:
+    # #     data.append([i.product.name, i.quantity, i.price, i.purchase_amount])
+    # # data.append(['', '', 'Total', inv.grand_total],)
+    # # table=Table(data, colWidths=[300, 50, 60, 70])
+    # # # adjust height of the row
+
+    # # table.setStyle(TableStyle([
+    # #     # make the first row gray background
+    # #     ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+    # #     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+    # #     ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+    # # ]))
+    # # table.wrapOn(p, 800, 600)#
+    # # print(count)
+    # # table.drawOn(p, 30, 500)
+    # p.showPage()
+    # p.save()
+
+    # # FileResponse sets the Content-Disposition header so that browsers
+    # # present the option to save the file.
+    # buffer.seek(0)
+    # response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = f'attachment; filename="bon_sortie{inv.receipt_no}.pdf"'
+    # response.write(buffer.getvalue())
+    # return response
 
 
 class CreateInvoiceView(FormView):
