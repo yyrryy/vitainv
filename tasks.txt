@@ -55,3 +55,7 @@ server {
         proxy_pass http://unix:/run/gunicorn.sock;
     }
 }
+
+
+
+deployed at: http://167.71.79.205/

@@ -562,7 +562,7 @@ def bonentree(request, id):
 def bonsentrees(request):
     bb=Itemsbysupplier.objects.all().order_by('-date')
     return render(request, 'products/supplierslist.html', {
-        'title':'لائحة فزاتير الموردين',
+        'title':'لائحة فواتير الموردين',
         'bonslist':bb,
         # bons is true to add condition in template to only use one teplate for suppliers list and bons list
         'bons':True
@@ -586,9 +586,9 @@ def supplierinfo(request, id):
     
 
     supplier=Supplier.objects.get(pk=id)
-    bons=Itemsbysupplier.objects.filter(supplier=supplier)
+    bons=Itemsbysupplier.objects.filter(supplier=supplier).order_by('-rest')
     return render (request, 'products/supplierinfo.html', {
-        'title':'Bon entree',
+        'title':supplier.name+' الفواتير',
         'bons':bons,
         'supplier':supplier
     })

@@ -104,7 +104,6 @@ class AddLedger(FormView):
 
 class CustomerLedgerView(TemplateView):
     template_name = 'ledger/customer_ledger_list.html'
-    print('RR')
     def dispatch(self, request, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return HttpResponseRedirect(reverse('login'))
@@ -151,7 +150,7 @@ class CustomerLedgerView(TemplateView):
             })
 
             customer_ledger.append(customer_data)
-
+        
         ledgers = Ledger.objects.all()
         if ledgers:
             grand_ledger = ledgers.aggregate(Sum('amount'))
@@ -163,7 +162,7 @@ class CustomerLedgerView(TemplateView):
             total_remaining_amount = grand_ledger - grand_payment
         else:
             total_remaining_amount = 0
-
+        customer_ledger=sorted(customer_ledger, key=lambda k: k['remaining_ledger'], reverse=True)
         context.update({
             'customer_ledgers': customer_ledger,
             'total_remaining_amount': total_remaining_amount,
