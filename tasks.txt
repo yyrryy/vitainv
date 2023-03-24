@@ -39,7 +39,7 @@ WantedBy=multi-user.target
 ## sites available ##
 server {
     listen 80;
-    server_name 167.71.79.205;
+    server_name 142.93.239.73;
 
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
@@ -58,4 +58,4 @@ server {
 
 
 
-deployed at: http://167.71.79.205/
+deployed at: http://142.93.239.73/

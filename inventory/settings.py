@@ -30,7 +30,7 @@ DEBUG = True
 
 
 if DEBUG:
-    ALLOWED_HOSTS = ['167.71.79.205', 'localhost']
+    ALLOWED_HOSTS = ['142.93.239.73', 'localhost']
     DATABASES = {
         'default': {
         'ENGINE': 'django.db.backends.sqlite3',
